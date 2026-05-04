@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Dynamics Stories</title>
+</head>
+<body>
+
+    <div id="loader">
+        <h1 class="LoadingName"><span class="dynamics">Dynamics</span> <span class="stories">Stories</span></h1>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+    </div>
+    <div id="settings-btn" onclick="toggleSettings()">⚙</div>
+
+    <div id="settings-panel">
+    <div class="settings-header">
+        <h2>Ajustes</h2>
+        <span class="close-settings" onclick="toggleSettings()">×</span>
+    </div>
+
+    <div class="setting-item">
+        <button class="danger-btn" onclick="borrarProgreso()">Borrar Todo el Progreso</button>
+    </div>
+    Pronto más funciones...
+    </div>
+
+    <div id="main-content">
+    <h1>Bienvenido a <span class="dynamics">Dynamics</span> <span class="stories">Stories</span></h1>
+    <p class="hello-world">¡Aquí puedes elegir la historia quieras leer! Algunas historias tienen en la descripción<br>
+    tienen un sello que dice "<span class="full-exp-mode">(Full Experience Mode)</span>". ¿No sabes qué es? <a class="more-infoFEM" href="moreInfo/moreInfo-of-FEM.html">más información</a></p>
+
+    <div class="btn-container">
+        <a href="./Stories/DDVR-story/DDVR_Cap1.html" class="story-card" style="background-image: url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=500');">
+            <div class="card-overlay">
+                <div class="card-info">
+                    <h3>¿De Donde Venimos Realmente?</h3>
+                    <p>AVANCES: Un misterio sobre la existencia de alguien es más profundo de lo que pensaba. <span style="color: rgb(35, 129, 98);">Inspirado en Among Us</span> <span class="full-exp-mode">(Full Experience Mode)</span></p>
+                </div>
+            </div>
+        </a>
+
+        <a href="./redirecting/index.html" class="story-card" style="background-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=500');">
+            <div class="card-overlay">
+                <div class="card-info">
+                    <h3>El Código Perdido</h3>
+                    <p><span class="Important">[!: Esta historia todavía no está disponible.]</span> ¡Pronto estará disponible!</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="./Stories/LHDI-story/LHDI_Cap1.html" class="story-card" style="background-image: url('https://images.unsplash.com/photo-1501139083538-0139583c060f?q=80&w=500');">
+            <div class="card-overlay">
+                <div class="card-info">
+                    <h3>La historia de un Impostor</h3>
+                    <p>AVANCES: Esta historia está enfocada en el impostor Snow de <span class="mentionStory">"¿De dónde venimos realmente?"</span> <span style="color: rgb(35, 129, 98);">Inspirado en Among Us</span> <span class="full-exp-mode">(Full Experience Mode)</span></p>
+                </div>
+            </div>
+        </a>
+    </div>
+   <button id="btn-continuar" class="choice-btn" onclick="continuarHistoria('DDVR')" style="display:none; margin: 20px auto; background: #eec200; color: #000;">
+    Continuar Capítulo
+    </button>
+    <a class="creditos" id="creditos" href="./creditos/index.html">Créditos</a>
+</div>
+
+<div id="user-btn" onclick="alert('Cuando termines de iniciar sesión serás redireccionado al sitio principal de UDU Studios, no a este.')" ondblclick="window.location.href='../Signin_UDU_Studios/index.html'">
+    <span id="user-tag">Iniciar Sesión</span>
+    </div>
+
+    <script src="./GlobalFunctions/storyCore.js"></script>
+    <script src="./loading.js"></script>
+    <script src="./settings.js"></script>
+    <script src="./udu_auth.js"></script>
+    <script>
+    // ESTA FUNCIÓN DEBE ESTAR AFUERA (Global)
+    function continuarHistoria(historiaNombre) {
+        console.log("Intentando continuar historia: " + historiaNombre); // Para ver en consola si funciona
+        const guardado = localStorage.getItem('UDU_Progreso_' + historiaNombre);
+        
+        if (guardado) {
+            const datos = JSON.parse(guardado);
+            // Redirige usando la ruta que tienes en GitHub
+            window.location.href = `Stories/${historiaNombre}-story/${historiaNombre}_Cap${datos.capitulo}.html`;
+        } else {
+            alert("No se encontró progreso guardado.");
+        }
+    }
+
+    window.addEventListener('load', () => {
+    const btn = document.getElementById('btn-continuar');
+    
+    // Lista de tus historias actuales
+    const historias = ['DDVR', 'LHDI']; // 'Impostor' debe ser el nombre que usas en saveAndExit
+    
+    let historiaEncontrada = null;
+
+    // Buscamos si hay progreso en alguna de ellas
+    historias.forEach(h => {
+        if (localStorage.getItem('UDU_Progreso_' + h)) {
+            historiaEncontrada = h;
+        }
+    });
+
+    if (historiaEncontrada && btn) {
+        btn.style.display = 'block';
+        // Configuramos el botón para que continúe la que encontró
+        btn.onclick = function() {
+            continuarHistoria(historiaEncontrada);
+        };
+    }
+});
+</script>
+</body>
+</html>

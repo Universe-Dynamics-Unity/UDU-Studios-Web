@@ -1,0 +1,532 @@
+/* Estilos generales actualizados */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Fondo de #333 a azul oscuro */
+    background: linear-gradient(135deg, #333 0%, #001f3f 100%);
+    color: white;
+    overflow: hidden;
+}
+
+#btn-continuar {
+    background: #eec200;
+    color: #000;
+    box-shadow: 0 0 15px rgba(238, 194, 0, 0.5);
+    animation: pulse 2s infinite;
+}
+
+.creditos {
+    font-family: sans-serif;
+    color: white;
+    border-radius: 8px;
+    padding: 12px 25px;
+    background: rgb(24, 73, 138);
+    cursor: pointer;
+    font-weight: bold;
+    border: rgb(41, 25, 99);
+}
+
+.creditos:hover {
+    transform: scale(1.05);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* --- CONTENEDOR DE CARGA (Loader) --- */
+        #loader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-color: #0b0b0b;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        #loader h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .progress-bar {
+            width: 250px;
+            height: 4px;
+            background: #222;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #007bff; /* Azul */
+            box-shadow: 0 0 10px #007bff;
+            animation: fillProgress 3s forwards;
+        }
+
+        @keyframes fillProgress {
+            to { width: 100%; }
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        #main-content {
+            display: none; /* Oculto al inicio */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+       /* --- CONTENEDOR DE TARJETAS --- */
+.btn-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    padding: 20px;
+    max-width: 1200px;
+}
+
+/* --- LA TARJETA (CARD) --- */
+.story-card {
+    position: relative;
+    width: 280px;
+    height: 380px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s ease;
+    display: block;
+}
+
+/* Efecto Hover */
+.story-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: #007bff;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* El degradado oscuro inferior */
+.card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%; /* El degradado cubre más de la mitad */
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+}
+
+.card-info h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #00c3ff; /* Azul para el título */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-info p {
+    margin: 8px 0 0 0;
+    font-size: 0.9rem;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+/* Ajuste para que el título principal no se vea apretado */
+#main-content h1 {
+    margin-bottom: 40px;
+}
+
+        .dynamics {
+            color: orange;
+        }
+
+        .stories {
+            color: rgb(0, 140, 255);
+        }
+
+        .full-exp-mode {
+            color: #eec200;
+        }
+
+        .Important {
+            color: rgb(255, 102, 0);
+        }
+
+        a {
+            color: #8800e2;
+        }
+
+        .mentionStory {
+            color: #00c3ff;
+        }
+
+        /* Botón de Usuario */
+#user-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px; /* Esquina derecha */
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 30px;
+    cursor: pointer;
+    z-index: 2000;
+    transition: 0.3s;
+    border: 1px solid #38bdf8; /* Azul para diferenciarlo de ajustes */
+    color: white;
+}
+
+#user-btn:hover {
+    background: #38bdf8;
+    color: black;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+}
+
+/* Estilos del Modal (Pop-up) */
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 3000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: #0f172a;
+    margin: 15% auto;
+    padding: 30px;
+    border: 2px solid orange;
+    width: 300px;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    right: 15px; top: 10px;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+#username-input {
+    width: 90%;
+    padding: 10px;
+    margin: 20px 0;
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: white;
+    border-radius: 5px;
+}
+
+#login-modal input {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    background: #1a1a1a;
+    color: white;
+}
+
+#auth-msg {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#login-modal input:focus {
+    border-color: orange;
+}
+
+/* Posicionamiento de la X de cerrar */
+.close-modal-top {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-modal-top:hover {
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Colores del Título */
+.modal-title {
+    margin-top: 10px; /* Espacio para que no choque con la X */
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+}
+
+.id-color {
+    color: #ff4d00; /* Naranja-rojizo */
+}
+
+.user-color {
+    color: #40e0d0; /* Turquesa */
+}
+
+/* Ajuste del contenedor del modal para permitir posicionamiento absoluto */
+.modal-content {
+    position: relative; /* Esto es vital para que la X se guíe por este cuadro */
+    background: #0f172a;
+    margin: 15% auto;
+    padding: 30px;
+    border: 2px solid orange;
+    width: 320px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.choice-btn {
+    background: transparent;
+    color: white;
+    border: 2px solid #38bdf8;
+    padding: 12px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    transition: 0.3s ease;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.choice-btn:hover {
+    background: #38bdf8;
+    color: #000;
+    transform: scale(1.05);
+}
+
+/* Contenedor del botón de acceso */
+#auth-section {
+    display: inline-block;
+    margin: 10px;
+}
+
+/* Estilo base del botón/link */
+#login-link {
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 2px solid #00d4ff;
+    color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+/* Efecto Hover */
+#login-link:hover {
+    background: #00d4ff;
+    color: #000;
+    box-shadow: 0 0 20px #00d4ff;
+    transform: scale(1.05);
+}
+
+/* Clase especial para cuando el usuario está logueado */
+.user-active {
+    border-color: #3cb17a !important; /* Verde UDU */
+    color: #3cb17a !important;
+    background: rgba(60, 177, 122, 0.1) !important;
+    box-shadow: 0 0 15px rgba(60, 177, 122, 0.4) !important;
+    animation: neon-pulse 2s infinite;
+}
+
+@keyframes neon-pulse {
+    0% { box-shadow: 0 0 5px rgba(60, 177, 122, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(60, 177, 122, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(60, 177, 122, 0.4); }
+}
+
+/* --- RESPONSIVIDAD (Añadir al final de style.css) --- */
+
+/* Para tablets y celulares (Pantallas menores a 768px) */
+@media (max-width: 768px) {
+    .LoadingName {
+        text-align: center;
+        font-size: 1.8rem; /* Título un poco más pequeño */
+    }
+    #main-content {
+        height: auto; /* Permite que el contenido crezca hacia abajo */
+        padding: 40px 20px;
+    }
+
+    #main-content h1 {
+        font-size: 1.8rem; /* Título un poco más pequeño */
+    }
+
+    .btn-container {
+       display: flex;
+       flex-wrap: wrap;      /* ¡ESTO evitará que se vean como palitos! */
+       justify-content: center;
+       gap: 30px;
+       padding: 20px;
+       width: 100%;          /* Asegura que use todo el espacio disponible */
+       box-sizing: border-box; 
+       flex-direction: column; /* Las pone una debajo de otra */
+       align-items: center;
+    }
+    
+    .story-card {
+        width: 90vw;          /* Ocupa el 90% del ancho de la pantalla del móvil */
+        max-width: 300px;     /* Pero no dejes que se vea gigante en tablets */
+        height: 380px;        /* Mantiene su altura original */
+        flex-shrink: 0;       /* PROHIBE que la tarjeta se encoja */
+    }
+
+    .hello-world {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+}
+
+/* Botón flotante */
+#settings-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 1001;
+    transition: transform 0.3s;
+    color: white;
+}
+
+#settings-btn:hover { transform: rotate(90deg) scale(1.1); }
+
+/* Panel lateral */
+#settings-panel {
+    position: fixed;
+    top: 0;
+    left: -300px; /* Escondido a la izquierda */
+    width: 250px;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.98);
+    border-right: 2px solid orange;
+    transition: 0.4s;
+    z-index: 1002;
+    padding: 20px;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+}
+
+#settings-panel.active { left: 0; }
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+}
+
+.setting-item { margin: 30px 0; text-align: left; }
+
+.danger-btn {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    align-items: center;
+    text-align: center;
+}
+
+/* --- SECCIÓN DE AJUSTES UDU --- */
+
+/* El botón circular del engranaje */
+#settings-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 28px;
+    background: rgba(0, 0, 0, 0.6);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 2000; /* Número alto para que siempre esté arriba */
+    transition: 0.3s;
+    border: 1px solid orange;
+}
+
+#settings-btn:hover {
+    transform: rotate(90deg);
+    background: orange;
+    color: black;
+}
+
+/* El panel lateral */
+#settings-panel {
+    position: fixed;
+    top: 0;
+    left: -320px; /* Escondido */
+    width: 280px;
+    height: 100%;
+    background: #0f172a;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+    z-index: 2001;
+    transition: 0.4s ease-in-out;
+    padding: 20px;
+    box-sizing: border-box;
+    border-right: 3px solid orange;
+}
+
+/* Cuando el panel se activa */
+#settings-panel.active {
+    left: 0;
+}
+
+/* Ajustes internos para que no se amontone el texto */
+.setting-item {
+    margin-bottom: 25px;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+}
+
+/* --- RESPONSIVIDAD (Celular) --- */
+@media (max-width: 600px) {
+    #settings-panel {
+        width: 100%; /* En celular ocupa toda la pantalla */
+        left: -100%;
+    }
+}

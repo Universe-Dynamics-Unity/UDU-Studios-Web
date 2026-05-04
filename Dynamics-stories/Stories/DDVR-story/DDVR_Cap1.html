@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script src="../../GlobalFunctions/storyCore.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿De Dónde Venimos Realmente? | Dynamics Stories</title>
+    <link rel="stylesheet" href="../../GlobalFunctions/StyleGlobalStories.css">
+</head>
+<body class="story-page">
+
+    <div class="reading-container">
+        <div id="banner-box" class="story-banner-container">
+            <img id="story-image" src="../BannersStories/DDVR-Cap1.png" onerror="this.parentElement.style.display='none'">
+        </div>
+        <header class="story-header">
+            <h1>¿De Dónde Venimos Realmente? Cap 1</h1>
+            <p class="author">Por: <span style="color: orange;">Dynamics</span> <span style="color: rgb(0, 162, 255);">Stories</span> & <span style="color: rgb(1, 177, 118);">Alan R.S</span></p>
+        </header>
+
+        <article class="story-content">
+            Hola, soy Guess y esta es mi historia…<br>
+            A veces el mundo te hace pensar, ¿no?<br>
+            A mí me dejó pensando: ¿de dónde vengo realmente?<br><br>
+
+            Así que un día intenté averiguarlo. Para empezar agarré mi hoja de tareas para ir haciendo lo que me tocaba y una donita para disfrutar en el camino.<br><br>
+
+            Al despertar para otro día de trabajo, empecé a investigar poco a poco la nave, porque si lo hacía demasiado evidente y no cumplía mis tareas, los tripulantes sospecharían de mí y me echarían pensando que soy alguien inútil por no hacer mis deberes.<br><br>
+
+            Primero fui a la cafetería de la nave y, antes de iniciar, me compré un exquisito desayuno de unas donitas con un café. Luego, al terminar, esperé a que repartieran las hojas con las tareas.<br><br>
+
+            Cuando me dieron mi hoja, la abrí y… ¡santa madre! Me encontré un montón de tareas, y para rematar, de las difíciles. Así que al ver eso, empecé de inmediato para terminar rápido.<br><br>
+
+            Entonces, ya iniciando mis tareas, hice primero la de tirar la basura. Pasé la basura de la cafetería al almacén, donde se expulsaba. Al llegar, vi a un grupo de tripulantes discutiendo por un error en sus hojas. Yo pasé de largo. No estaba concentrado en eso: tenía una pregunta rondándome la cabeza. ¿De dónde vengo realmente?<br>
+            Ya comenzaba a volverse un pensamiento ruidoso, pero intentaba disimularlo.<br><br>
+
+            Por fin llegué a la esquina del almacén, donde estaba la palanca para sacar la basura. La bajé y pude ver cómo la compuerta debajo se abría, expulsando todo al espacio exterior.<br><br>
+
+            Y me quedé pensando… ¿qué pasaría si algún día salgo de esta nave para ver qué hay afuera?<br>
+            Pero no me quedé mucho en eso, porque apenas había terminado una tarea y faltaban más. Así que seguí.<br><br>
+
+            Luego hice las demás tareas, de las más difíciles a las más fáciles. Al terminar, llevé mi hoja con mucha alegría porque tenía todas las casillas marcadas. La entregué al repartidor de hojas para que la revisara. Me dejó algo de trabajo extra por terminar antes: revisar las cámaras para ver si los tripulantes restantes hacían sus tareas. Si alguien no las hacía, debía avisarle para que lo registrara.<br><br>
+
+            Ya en la sala de cámaras, me senté en la sillita al lado de las pantallas que proyectan lo que ven las cámaras y empecé a ver qué pasaba. Pero seguía concentrado en la misma pregunta… esa que no podía sacar de mi cabeza aunque quisiera.<br><br>
+        </article>
+        <div class="navigation-buttons">
+            <button class="choice-btn" onclick="saveAndExit('DDVR', 1)">Salir al menú</button>
+            <button class="choice-btn" onclick="nextChapter('DDVR_Cap2.html')">Ir al capítulo 2</button>
+        </div>
+    </div>
+    <script>
+    window.addEventListener('load', () => {
+    const img = document.getElementById('story-image');
+    const box = document.getElementById('banner-box');
+    
+    if (img && img.complete && img.naturalHeight !== 0) {
+        box.classList.add('has-image');
+        }
+    });
+    </script>
+    <div class="music-player-container">
+        <iframe id="music-iframe" width="100%" height="100%" 
+            src="https://www.youtube.com/embed/lxMGUpdjMj4?autoplay=1&enablejsapi=1" 
+            frameborder="0" allow="autoplay">
+        </iframe>
+    </div>
+
+</body>
+</html>

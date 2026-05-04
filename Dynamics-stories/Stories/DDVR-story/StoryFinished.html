@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final de ¿De dónde venimos realmente? | Dynamics Stories</title>
+    <link rel="stylesheet" href="DDVR.css"> <link rel="stylesheet" href="../../GlobalFunctions/StyleGlobalStories.css">
+</head>
+<body class="story-page">
+
+    <div class="reading-container">
+        <header class="story-header">
+            <h1>Gracias por leer la historia</h1>
+            <p class="author">Por: <span style="color: orange;">Dynamics</span> <span style="color: rgb(0, 162, 255);">Stories</span> & <span style="color: rgb(1, 177, 118);">Alan R.S</span></p>
+        </header>
+        <p class="palabrasFinales">¡Esperamos que te haya gustado la historia!<br>
+        Puedes poner tus comentarios y valoración de la historia tocando "Valorar historia"<br>
+        o puedes salir tocando "Salir al menú".</p>
+        <div class="navigation-buttons">
+            <button class="choice-btn" onclick="eliminarProgreso()">Salir al menú</button>
+            <button class="choice-btn" onclick="location.href='../../storyEvaluation/DDVR_Evaluations/comments_DDVR.html'">Valorar historia</button>
+        </div>
+    </div>
+
+    <div class="music-player-container">
+    <iframe id="music-iframe" width="100%" height="100%" 
+        src="https://www.youtube.com/embed/iTt-16XtvRc?autoplay=1&enablejsapi=1controls=1" 
+        frameborder="0" 
+        allow="autoplay; encrypted-media" 
+        allowfullscreen>
+    </iframe>
+</div>
+
+<script>
+    function eliminarProgreso() {
+        localStorage.clear();
+        alert("Volviendo al menú principal...");
+        location.href = "../../index.html";
+    }
+</script>
+</body>
+</html>

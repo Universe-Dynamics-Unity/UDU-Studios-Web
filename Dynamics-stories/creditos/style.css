@@ -1,0 +1,104 @@
+body {
+    font-family: sans-serif;
+    background: linear-gradient(135deg, #333 0%, #001f3f 100%);
+    color: white;
+    text-align: center;
+}
+.credits-container {
+            text-align: center;
+            padding: 50px 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        .team-member {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid orange;
+        }
+        .role {
+            color: #38bdf8;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .name {
+            font-size: 1.5rem;
+            margin: 10px 0;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        a {
+            color: rgb(0, 255, 213);
+        }
+    
+    /* --- RESPONSIVIDAD PARA CELULARES --- */
+@media (max-width: 600px) {
+    .credits-container {
+        padding: 20px 15px; /* Menos espacio a los lados */
+    }
+
+    h1 {
+        font-size: 1.6rem; /* Título más pequeño para que no se corte */
+    }
+
+    .team-member {
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .name {
+        font-size: 1.2rem; /* Nombres más ajustados */
+    }
+
+    .role {
+        font-size: 0.8rem; /* Roles más legibles en pantallas chicas */
+    }
+    
+    p {
+        font-size: 0.95rem; /* Texto de descripción un poco más pequeño */
+    }
+
+    .social-links {
+        flex-direction: column; /* Se ponen uno sobre otro en pantallas chicas */
+        align-items: center;
+    }
+    .social-btn {
+        width: 80%; /* Botones más grandes para tocar con el pulgar */
+    }
+    .choice-btn {
+        width: 80%;
+    }
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.social-btn {
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.8rem;
+    transition: 0.3s;
+    color: white;
+}
+
+/* Color para YouTube */
+.yt { background-color: #ff0000; border: 1px solid rgba(255, 255, 255, 0.2); }
+.yt:hover { background-color: #cc0000; transform: scale(1.1); }
+
+/* Color para GitHub */
+.gh { background-color: #333; border: 1px solid #555; }
+.gh:hover { background-color: #444; transform: scale(1.1); }
+
+.udu { background-color: orange; border: 1px solid rgb(148, 49, 13);  margin: 20px; }
+.udu:hover { background-color: rgb(229, 255, 0); transform: scale(1.1); }
+
+.choice-btn { background-color: rgb(0, 204, 255); font-weight: bold; transition: 0.3s; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; }
+.choice-btn { background-color: rgb(0, 140, 255); transform: scale(1.1); }

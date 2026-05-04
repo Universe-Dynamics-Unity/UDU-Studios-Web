@@ -1,0 +1,18 @@
+body {
+    font-family: sans-serif;
+    color: black;
+    text-align: center;
+    background: white;
+}
+
+.grisclaro {
+    color: rgb(170, 170, 170);
+}
+
+.grisfuerte {
+    color: rgb(100, 102, 104);
+}
+
+.error-004 {
+    color: rgb(152, 153, 158);
+}

@@ -1,0 +1,10 @@
+El funcionamiento de la web "Dynamics Stories y su mantenimiento":
+Dynamics Stories Instructions.
+
+Libros completados: 1 (DDVR)
+
+La dinámica para usar las funciones (saveAndExit) como vemos aquÍ:
+
+'<button class="choice-btn" onclick="saveAndExit('DDVR', X)">Salir al menú</button>'
+
+Es totalmente fácil y automática desde 
