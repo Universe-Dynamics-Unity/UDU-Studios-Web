@@ -1,0 +1,239 @@
+body {
+    font-family: sans-serif;
+    background: #070116;
+    color: #eee;
+    justify-content: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.W-UDUS { 
+    margin-top: 30px;
+}
+
+.U {
+    color: red;
+}
+
+.D {
+    color: orange;
+}
+
+.U2 {
+    color: yellow;
+}
+
+.Studios {
+    color: rgb(42, 192, 130);
+}
+
+.important {
+    color: rgb(63, 142, 216);
+}
+
+/* Contenedor principal de la lista */
+.proyectos-lista {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* Estilo para cada bloque de proyecto */
+.proyecto-item {
+    margin-bottom: 50px; /* Esto crea el efecto de "hilito" hacia abajo */
+    border-left: 3px solid #2ac082; /* Una línea lateral para guiar la vista */
+    padding-left: 20px;
+    text-align: left;
+}
+
+.proyecto-item h2 {
+    color: #eee;
+    margin-bottom: 5px;
+}
+
+.proyecto-item p {
+    color: #bbb;
+    margin-bottom: 15px;
+}
+
+/* Botones generales */
+.btn-proyecto, .btn-tienda {
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.3s ease; /* Para que el hover sea suave */
+}
+
+/* Color para Zombie Tomb y Dynamics Stories */
+.btn-proyecto {
+    background: #3f8ed8;
+    color: white;
+}
+
+/* El Hover Cool */
+.btn-proyecto:hover {
+    background: #2ac082;
+    transform: scale(1.05); /* Se hace un poquito más grande */
+    box-shadow: 0px 0px 15px rgba(42, 192, 130, 0.5);
+}
+
+/* Botón especial de la Tienda (Carrito) */
+.tienda {
+    border-left: 3px solid #ff9900;
+}
+
+.btn-tienda {
+    background: #ff9900;
+    color: white;
+}
+
+.btn-tienda:hover {
+    background: #ff5500;
+    transform: translateY(-3px); /* Flota un poquito */
+    box-shadow: 0px 5px 15px rgba(255, 85, 0, 0.4);
+}
+
+/* --- DISEÑO RESPONSIVO PARA TELÉFONOS Y TABLETS --- */
+
+/* Para Tablets (Pantallas menores a 768px) */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 15px; /* Agregamos espacio a los lados */
+    }
+
+    .proyectos-lista {
+        width: 90%; /* La lista ocupa más ancho en pantallas chicas */
+        margin: 20px auto;
+    }
+
+    .W-UDUS {
+        font-size: 1.8rem; /* Título un poco más pequeño */
+    }
+}
+
+/* Contenedor del botón de acceso */
+#auth-section {
+    position: fixed; /* Se queda pegado a la pantalla */
+    top: 35px;       /* Distancia desde arriba */
+    right: 20px;     /* Distancia desde la derecha */
+    z-index: 9999;   /* Para que siempre esté por encima de todo lo demás */
+}
+
+/* Estilo base del botón/link */
+#login-link {
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 2px solid #00d4ff;
+    color: #00d4ff;
+    min-width: 120px; /* Le da un espacio base para que no se vea cortado */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #070116;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+/* Efecto Hover */
+#login-link:hover {
+    background: #00d4ff;
+    color: #000;
+    box-shadow: 0 0 20px #00d4ff;
+    transform: scale(1.05);
+}
+
+/* Clase especial para cuando el usuario está logueado */
+.user-active {
+    border-color: #3cb17a !important; /* Verde UDU */
+    color: #3cb17a !important;
+    background: rgba(60, 177, 122, 0.1) !important;
+    box-shadow: 0 0 15px rgba(60, 177, 122, 0.4) !important;
+    animation: neon-pulse 2s infinite;
+}
+
+@keyframes neon-pulse {
+    0% { box-shadow: 0 0 5px rgba(60, 177, 122, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(60, 177, 122, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(60, 177, 122, 0.4); }
+}
+
+/* --- NUEVOS ESTILOS DE CARGA Y VERIFICACIÓN --- */
+
+/* El circulito de carga */
+.loader {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #00d4ff;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Color azul para usuario normal */
+.user-blue {
+    color: #3f8ed8 !important;
+    border-color: #3f8ed8 !important;
+}
+
+/* Estilo SuperUsuario (Meta Verified Style) */
+.verified-badge {
+    color: #00d4ff;
+    text-shadow: 0 0 10px #00d4ff;
+    font-size: 1.1rem;
+}
+
+/* Brillo especial para el SuperUsuario */
+.admin-glow {
+    border-color: #ff00ff !important; /* Un rosa/magenta neón */
+    color: #ff00ff !important;
+    background: rgba(255, 0, 255, 0.1) !important;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.6) !important;
+    animation: admin-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes admin-pulse {
+    0% { box-shadow: 0 0 10px rgba(255, 0, 255, 0.4); }
+    50% { box-shadow: 0 0 30px rgba(255, 0, 255, 0.9); }
+    100% { box-shadow: 0 0 10px rgba(255, 0, 255, 0.4); }
+}
+
+/* Para Teléfonos (Pantallas menores a 480px) */
+@media screen and (max-width: 480px) {
+    .W-UDUS {
+        font-size: 1.5rem;
+    }
+
+    .what-UDUS {
+        font-size: 0.9rem; /* Texto más legible en móvil */
+        line-height: 1.4;
+    }
+
+    .proyecto-item {
+        margin-bottom: 35px; /* Menos espacio entre bloques */
+        padding-left: 15px;
+    }
+
+    .proyecto-item h2 {
+        font-size: 1.3rem;
+    }
+
+    /* Botones más grandes para que sea fácil picar con el dedo */
+    .btn-proyecto, .btn-tienda {
+        width: 100%; /* El botón ocupa todo el ancho disponible */
+        text-align: center;
+        box-sizing: border-box;
+        padding: 15px;
+    }
+}

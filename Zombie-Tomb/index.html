@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zombie Tomb Project - UDU Studios</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="mobile.css">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+</head>
+<body>
+
+    <div id="game-container">
+        
+        <div id="main-menu">
+            <h1 class="game-title">ZOMBIE<br>TOMB</h1>
+            
+            <div class="button-container">
+                <button id="btn-play" class="menu-button">JUGAR</button>
+                <button id="btn-shop" class="menu-button" onclick="window.location.href='tienda/shop.html'">TIENDA</button>
+                <button id="btn-reset" class="menu-button secondary" style="background-color: #ff4d4d; color: white;">BORRAR PROGRESO</button>
+                <button id="btn-credits" class="menu-button secondary">CRÉDITOS</button>
+                
+                <p class="notes-next-update">Notas de la próxima update (1.2):<br> Se volverá disponible el botón "créditos" y<br> más niveles... próximamente. Esperamos que te haya gustado la update 1.1 :)</p>
+            </div>
+            
+            <img src="assets/ui/logo_UDU_Studios-pixelart.png" alt="UDU Studios" class="brand-logo">
+        </div>
+    </div>
+
+    <div id="level-selector" style="display: none;">
+    <button id="btn-back-main" class="back-button">⬅ VOLVER</button>
+    <h2 class="section-title">NIVELES</h2>
+    
+    <div class="timeline-wrapper">
+        <div class="timeline-line"></div>
+        <div id="levels-container">
+            </div>
+    </div>
+    
+    <p class="coins-display">PUNTOS: <span id="total-points">0</span></p>
+    </div>
+
+    <script src="game.js"></script>
+
+</body>
+</html>

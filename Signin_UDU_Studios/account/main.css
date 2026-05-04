@@ -1,0 +1,66 @@
+    body {
+            background: #070116;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .account-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #3f8ed8;
+            box-shadow: 0 0 20px rgba(63, 142, 216, 0.2);
+            width: 320px;
+        }
+        .user-name { font-size: 1.5rem; font-weight: bold; margin: 10px 0; }
+        .badge { font-size: 0.9rem; padding: 5px 10px; border-radius: 5px; background: #3f8ed8; }
+        .btn-back {
+            margin-top: 20px;
+            display: inline-block;
+            color: #bbb;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .btn-back:hover { color: white; }
+
+        .edit-section { margin-bottom: 15px; }
+
+#edit-name-input {
+    background: #1a1a1a;
+    border: 1px solid #3f8ed8;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    outline: none;
+}
+
+.btn-small {
+    background: #3f8ed8;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn-danger {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-danger:hover {
+    background: #cc0000;
+    transform: scale(1.05);
+}

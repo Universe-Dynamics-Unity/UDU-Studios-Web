@@ -1,0 +1,140 @@
+<!-- Versión "All in the same house" 1.0 o traducido "Todos en la misma casa" -->
+<!-- Configuración de html:5 -->
+<!DOCTYPE html>
+<!-- Esto de "<html lang="es">" es para decirle al navegador que este sitio es idioma español-->
+<html lang="es">
+    <head>
+        <!-- COnfiguración de los estilos de el sitio-->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="./public/icon_udu.png" type="image/png">
+        <!-- ' href="" ' s¿le pide al navegador que busque en una carpeta o link específico -->
+        <!-- Ahorita  con "<link rel="stylesheet" href="public/style.css">" estamos diciendo al navegador
+         que busque un archivo que tiene los estilos del sitio -->
+        <link rel="stylesheet" href="public/style.css">
+        <!-- Esto de '<title>UDU Studios</title>' es el título de la pestaña que ponemos -->
+        <title>UDU Studios</title>
+    </head>
+    <body>
+        <!-- h1 de título, h1 hace que se vea grande el título -->
+        <h1 class="W-UDUS">¡Bienvenido a <span class="U">U</span><span class="D">D</span><span class="U2">U</span> <span class="Studios">Studios</span>!</h1>
+        
+    <!-- Botón para iniciar sesión -->
+    <div id="auth-section">
+        <!-- link al sitio web para Iniciar Sesión-->
+        <a href="./Signin_UDU_Studios/index.html" id="login-link" style="min-width: 140px;">
+            <div class="loader"></div> Verificando...
+        </a>
+    </div>
+
+        <!-- Sección de presentación -->
+        <p class="what-UDUS">¿<b>No sabes</b> qué es <span class="U">U</span><span class="D">D</span><span class="U2">U</span> <span class="Studios">Studios</span>?<br>
+
+        <span class="important">UDU Studios</span> o <span class="important">Universe Dynamics Unity Studios</span> es una compañía creada por <span class="important">Alan R.S</span>.<br>
+        Fue fundada el año <span class="important">2023 en septiembre</span>. No somos la compañía gigante que te imaginas<br>
+        pero hasta hoy en esta pequeña empresa hemos creado diferentes cosas para tu entretenimiento<br>
+        Originales de UDU Studios.<br> <span style="color: rgb(255, 153, 0);">¡Anímate y échale un vistazo a nuestro contenido!</span> <span style="color: rgb(255, 251, 0);">:D</span></p>
+
+        <!-- Sección de Proyectos -->
+<div class="proyectos-lista">
+    
+    <div class="proyecto-item">
+        <h2>Zombie Tomb</h2>
+        <p>Atrévete a entrar en este juego de laberintos lleno de zombies y misterio.</p>
+        <!-- Enlace a Zombie Tomb -->
+        <a href="./Zombie-Tomb/index.html" class="btn-proyecto" target="_blank" rel="noopener noreferrer">Jugar Ahora</a>
+    </div>
+
+    <div class="proyecto-item">
+        <h2>Dynamics Stories</h2>
+        <p>Lee las mejores historias originales creadas por UDU Studios. (Sitio web aún en progreso)</p>
+        <!-- Enlace a Dynamics Stories -->
+        <a href="./Dynamics-stories/index.html" class="btn-proyecto" target="_blank" rel="noopener noreferrer">Explorar Historias</a>
+    </div>
+
+    <div class="proyecto-item">
+        <h2>UDU-APB</h2>
+        <p>Aprende programación básica. (Sitio web aún en progreso)</p>
+        <!-- Enlace a UDU-APB -->
+        <!-- He cambiado el link de "./UDU-APB/index.html" a "./catchError.html" porque UDU-APB
+        tiene errores a arreglar por la nueva implementación de Inicio de Sesión con firebase -->
+        <a href="./catchError.html" class="btn-proyecto" target="_blank" rel="noopener noreferrer">Explorar Sitio</a>
+    </div>
+
+    <!-- <div class="proyecto-item tienda">
+        <h2>🛒 UDU Shop</h2>
+        <p>O si quieres ve qué productos tiene UDU Studios.</p>
+        <a href="#" class="btn-tienda">Ver Productos</a>
+    </div> -->
+
+</div>
+
+<!-- Función para instalar sitio en los dispositivos -->
+<link rel="manifest" href="./public/manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js');
+  }
+</script>
+
+<script type="module">
+import { auth, db } from './Signin_UDU_Studios/firebase_config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+const loginLink = document.getElementById('login-link');
+
+console.log("🖥️ 1. Iniciando escáner de UDU Studios...");
+
+const authTimeout = setTimeout(() => {
+    if (loginLink.innerText.includes("Verificando")) {
+        resetToLogin();
+        console.warn("⚠️ 2. Tiempo agotado: Firebase no respondió a tiempo.");
+    }
+}, 7000); 
+
+onAuthStateChanged(auth, async (user) => {
+    clearTimeout(authTimeout); // Apagamos el cronómetro de seguridad
+    
+    if (user) {
+        console.log("✅ 3. ¡Usuario detectado en Auth! UID:", user.uid);
+        try {
+            const docRef = doc(db, "usuarios", user.uid);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                console.log("✅ 4. Datos encontrados en la Base de Datos.");
+                const userData = docSnap.data();
+                const nombre = userData.nombreUsuario;
+                
+                if (userData.rango === "UDU_Studios-Account") {
+                    loginLink.innerHTML = `<span class="verified-badge">🔹</span> ${nombre}`;
+                    loginLink.classList.add('admin-glow');
+                } else {
+                    loginLink.innerHTML = `👤 ${nombre}`;
+                    loginLink.classList.add('user-blue');
+                }
+                loginLink.href = "./Signin_UDU_Studios/account/index.html";
+                console.log("🚀 5. Acceso concedido y botón actualizado.");
+            } else {
+                console.warn("❌ 4. El usuario existe, pero NO tiene datos guardados en Firestore.");
+                resetToLogin();
+            }
+        } catch (error) {
+            console.error("❌ 4. Error al conectar con Firestore:", error);
+            resetToLogin();
+        }
+    } else {
+        console.log("🛑 3. No se detectó ninguna sesión activa en este dominio.");
+        resetToLogin();
+    }
+});
+
+function resetToLogin() {
+    loginLink.innerHTML = "Iniciar Sesión";
+    loginLink.classList.remove('user-blue', 'admin-glow');
+    loginLink.href = "./Signin_UDU_Studios/index.html";
+}
+</script>
+    </body>
+</html>

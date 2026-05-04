@@ -1,0 +1,65 @@
+/* Variables de color para Universe Dynamics */
+:root {
+    --bg-dark: #0f172a;       /* Azul muy oscuro (espacial) */
+    --card-bg: #1e293b;       /* Azul grisáceo para las tarjetas */
+    --accent-blue: #38bdf8;   /* Azul brillante para enlaces */
+    --accent-green: #22c55e;  /* Verde para "Completado" */
+    --text-main: #f1f5f9;     /* Blanco casi puro */
+    --text-dim: #94a3b8;      /* Gris para descripciones */
+}
+
+.important {
+    color: rgb(0, 195, 255);
+}
+
+.important1 {
+    color: #00ffaa;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    
+    /* --- CAMBIOS PARA QUE NO SEA MINI --- */
+    width: 100%;       /* Ocupa todo el ancho del celular */
+    margin: 0;         /* Quita los espacios de los lados */
+    padding: 15px;     /* Solo un poquito de margen interno para que no pegue al cristal */
+    font-size: 18px;   /* Texto un poco más grande para leer sin ojos de detective */
+}
+
+h1 {
+    font-size: 1.8rem;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: #00ff73;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.btn-regresar {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: var(--accent-blue);
+    color: var(--bg-dark);
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-regresar:hover {
+    background-color: #7dd3fc; /* Un azul un poco más claro al pasar el mouse */
+    transform: scale(1.05);    /* Se agranda un poquito */
+}
+
+.btn-regresar:active {
+    transform: scale(0.95);    /* Se encoge al darle clic */
+}

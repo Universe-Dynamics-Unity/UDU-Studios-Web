@@ -1,0 +1,217 @@
+/* Variables de color para Universe Dynamics */
+:root {
+    --bg-dark: #0f172a;       /* Azul muy oscuro (espacial) */
+    --card-bg: #1e293b;       /* Azul grisáceo para las tarjetas */
+    --accent-blue: #38bdf8;   /* Azul brillante para enlaces */
+    --accent-green: #22c55e;  /* Verde para "Completado" */
+    --text-main: #f1f5f9;     /* Blanco casi puro */
+    --text-dim: #94a3b8;      /* Gris para descripciones */
+}
+
+/* Configuración base para Móvil */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    
+    /* --- CAMBIOS PARA QUE NO SEA MINI --- */
+    width: 100%;       /* Ocupa todo el ancho del celular */
+    margin: 0;         /* Quita los espacios de los lados */
+    padding: 15px;     /* Solo un poquito de margen interno para que no pegue al cristal */
+    font-size: 18px;   /* Texto un poco más grande para leer sin ojos de detective */
+}
+
+/* --- ESTO ES PARA QUE EN PC NO SE ESTIRE FEO --- */
+@media (min-width: 768px) {
+    body {
+        max-width: 500px;
+        margin: 40px auto; 
+        border-radius: 20px;
+        border: 1px solid #334155;
+    }
+}
+
+/* Encabezado */
+header {
+    text-align: center;
+    padding: 30px 0;
+}
+
+h1 {
+    font-size: 1.8rem;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.important {
+    color: rgb(0, 195, 255);
+}
+
+.ej-code {
+    color: #00ff41;  /* Verde Matrix / Retro */
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.btn-locked {
+    background-color: #475569 !important; /* Gris oscuro */
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+/* Efecto opcional para que los items bloqueados se vean más oscuros */
+li:has(.btn-locked) {
+    opacity: 0.8;
+}
+
+/* Barra de Progreso */
+#progreso-container {
+    background: #334155;
+    width: 100%;
+    height: 12px;
+    border-radius: 10px;
+    margin-top: 15px;
+    overflow: hidden; /* Para que la barra interna no se salga de los bordes redondeados */
+}
+
+#barra-progreso {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+    transition: width 0.4s ease;
+}
+
+/* Lista de Lecciones */
+ul {
+    list-style: none;
+    margin-top: 30px;
+}
+
+li {
+    background-color: var(--card-bg);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+li h3 {
+    margin-bottom: 8px;
+    color: var(--accent-blue);
+}
+
+li p {
+    font-size: 1.0rem;
+    color: var(--text-dim);
+    margin-bottom: 15px;
+}
+
+/* Botones (Fat-Finger Friendly) */
+a, button {
+    display: inline-block;
+    width: 100%; /* En móvil, los botones a todo lo ancho son más fáciles de tocar */
+    padding: 16px;
+    text-align: center;
+    background-color: var(--accent-blue);
+    color: var(--bg-dark);
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+a:active, button:active {
+    opacity: 0.8; /* Efecto visual al tocar */
+}
+
+/* Estatus de la lección */
+.status {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.content-card {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 15px;
+    text-align: left;
+    margin-top: 20px;
+}
+
+input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* --- ESTILOS DEL EDITOR INTERACTIVO --- */
+.editor-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#editor-codigo {
+    width: 100%;
+    height: 150px;
+    background: #000; /* Fondo negro profundo */
+    color: #00ff41;  /* Verde Matrix / Retro */
+    font-family: 'Consolas', 'Monaco', monospace;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--accent-blue);
+    resize: none;
+}
+
+#visor-resultado {
+    width: 100%;
+    height: 120px;
+    background: #fff;
+    border-radius: 8px;
+    border: none;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+
+.hint {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+}
+
+footer {
+    margin-top: 10px;
+}
+
+.creditsredictioner {
+    color: var(--bg-dark);
+    background-color: rgb(0, 255, 115);
+    display: inline-block;
+    width: 100%; /* En móvil, los botones a todo lo ancho son más fáciles de tocar */
+    padding: 16px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.down20px {
+    margin-top: 20px;
+}

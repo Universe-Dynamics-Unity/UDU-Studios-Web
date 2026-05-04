@@ -1,0 +1,109 @@
+/* --- DISEÑO BASE (Mobile First) --- */
+body {
+    background-color: #1a0033; /* Estilo Dark Mode */
+    color: white;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+#shop-container {
+    width: 100%; /* Ocupa toda la pantalla en celulares */
+    max-width: 600px; /* Pero no se hace gigante en PC */
+    min-height: 100vh;
+    background: #2a0052;
+    padding: 20px;
+    box-sizing: border-box; /* Evita que el padding rompa la pantalla */
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+header h1 {
+    color: #ffcc00;
+    text-shadow: 2px 2px #8800e2;
+    font-size: 2.2em;
+    margin-top: 10px;
+}
+
+#coin-status {
+    background: rgba(0,0,0,0.3);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+/* --- GRID RESPONSIVO --- */
+#items-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 1 sola columna en celulares */
+    gap: 15px;
+}
+
+.shop-item {
+    background: #3d007a;
+    border: 2px solid #8800e2;
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.2s;
+}
+
+.shop-item:hover {
+    transform: scale(1.02);
+}
+
+.shop-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain; /* Evita que la imagen se deforme */
+}
+
+.item-info h3 {
+    margin: 10px 0 5px 0;
+}
+
+.item-info p {
+    margin: 0 0 15px 0;
+    color: #ffcc00;
+    font-weight: bold;
+}
+
+button {
+    background: #ffcc00;
+    color: #3d007a;
+    border: none;
+    padding: 14px 20px; /* Botones más gorditos, ideales para tocar en pantallas táctiles */
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    width: 100%;
+    max-width: 250px;
+}
+
+button:disabled {
+    background: #555;
+    color: #888;
+    cursor: not-allowed; /* Cambia el mouse si no tienes monedas */
+}
+
+#btn-back {
+    margin-top: 30px;
+    background: #ff4d4d;
+    color: white;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* --- ADAPTACIÓN A PANTALLAS GRANDES (PC / Tablets) --- */
+@media (min-width: 480px) {
+    #items-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas si hay espacio */
+    }
+}

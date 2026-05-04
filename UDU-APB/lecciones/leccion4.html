@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lección 4 : UDU-APB</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <header>
+        <a href="../index.html">← Salir para repasar</a>
+        <h1>Lección 4: Escribe TÚ primer etiqueta</h1>
+    </header>
+
+    <main class="content-card">
+        <p>Escribe el código para un título principal que diga: <b>Hola Cosmos</b></p>
+        <p class="hint">Usa la etiqueta &lt;h1&gt;</p>
+
+        <div class="editor-container">
+            <textarea id="editor-codigo" placeholder="Escribe aquí..."></textarea>
+            <p>Resultado en tiempo real:</p>
+            <iframe id="visor-resultado"></iframe>
+        </div>
+
+        <button id="btn-validar" class="btn-primary" style="display:none;" onclick="finalizarLeccionInteractiva(4)">
+            ✅ Finalizar y Guardar Lección
+        </button>
+    </main>
+
+    <script src="../script.js"></script>
+    <script>
+        // Solo arrancamos la lógica con la respuesta que queremos
+        inicializarEditor(4, "<h1>Hola Cosmos</h1>");
+    </script>
+</body>
+</html>

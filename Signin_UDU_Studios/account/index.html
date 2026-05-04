@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDU Studios | Centro de Cuentas</title>
+    <link rel="stylesheet" href="../../public/style.css"> <link rel="stylesheet" href="./main.css"> <!-- Reutiliza tus estilos -->
+</head>
+<body>
+
+    <div class="account-card">
+        <h2 class="Studios">Centro de Cuentas</h2>
+        <div id="loader">Cargando perfil...</div>
+
+        <div id="profile-content" style="display: none;">
+    <div id="user-icon" style="font-size: 3rem; cursor: pointer;" title="Cambiar foto">👤</div>
+
+    <div class="user-name" id="display-name">---</div>
+    
+    <!-- Editar Nombre -->
+    <div class="edit-section">
+        <input type="text" id="edit-name-input" placeholder="Nuevo apodo...">
+        <button id="btn-save-name" class="btn-small">Actualizar Apodo</button>
+    </div>
+
+    <div id="user-rank" class="badge">Usuario</div>
+
+    <hr style="border: 0.5px solid #333; margin: 20px 0;">
+
+    <!-- Zona Peligrosa -->
+    <button id="btn-delete-account" class="btn-danger">Borrar cuenta</button>
+        </div>
+
+        <a href="../../index.html" class="btn-back">← Volver al inicio</a>
+    </div>
+
+    <script type="module">
+    // Importamos la configuración desde la carpeta padre (Signin_UDU_Studios)
+    import { auth, db } from '../firebase_config.js';
+import { onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const docRef = doc(db, "usuarios", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const userData = docSnap.data();
+            const nameDisplay = document.getElementById('display-name');
+            nameDisplay.innerText = userData.nombreUsuario;
+            
+            // Configuración de Rango (Tu lógica actual)
+            if (userData.rango === "UDU_Studios-Account") {
+                document.getElementById('user-icon').innerText = "🔹";
+                document.getElementById('user-rank').innerText = "SuperUsuario / Admin";
+                document.getElementById('user-rank').style.background = "#ff00ff";
+            } else {
+                document.getElementById('user-rank').innerText = userData.rango || "Developer";
+            }
+
+            // --- FUNCIÓN: ACTUALIZAR NOMBRE ---
+            document.getElementById('btn-save-name').onclick = async () => {
+                const newName = document.getElementById('edit-name-input').value;
+                if (newName.length > 2) {
+                    await updateDoc(docRef, { nombreUsuario: newName });
+                    nameDisplay.innerText = newName;
+                    alert("¡Apodo actualizado en UDU Studios!");
+                }
+            };
+
+            // --- FUNCIÓN: BORRAR CUENTA ---
+            document.getElementById('btn-delete-account').onclick = async () => {
+                const confirmacion = confirm("¿En serio vas a borrar la cuenta? No hay vuelta atrás.");
+                if (confirmacion) {
+                    try {
+                        await deleteDoc(docRef); // Borra de la base de datos
+                        await deleteUser(user);  // Borra del sistema de autenticación
+                        alert("Cuenta borrada.");
+                        window.location.href = "../../index.html";
+                    } catch (error) {
+                        alert("Error: Debes haber iniciado sesión hace poco para hacer esto.");
+                    }
+                }
+            };
+
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('profile-content').style.display = 'block';
+        }
+    } else {
+        window.location.href = "../../index.html";
+    }
+});  
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+/* Estilo Base Cyberpunk */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle, #0c002b 0%, #02001b 100%);
+            color: #eafdff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background: #00021b;
+            padding: 40px;
+            border-radius: 15px;
+            border: 2px solid rgba(0, 0, 0, 0.507);
+            width: 350px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .U {
+            color: red;
+        }
+
+        .D {
+            color: orange;
+        }
+
+        .U2 {
+            color: yellow;
+        }
+
+        .Studios {
+            color: rgb(42, 192, 130);
+        }
+
+        p {
+            font-size: 0.9rem;
+            color: #495b8f;
+            margin-bottom: 30px;
+        }
+
+        input {
+            display: block;
+            margin: 15px auto;
+            padding: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            background: white;
+            border: 1px solid rgb(31, 31, 31);
+            border-radius: 5px;
+            color: rgb(8, 8, 8);
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #000000;
+            outline: none;
+            box-shadow: 0 0 8px rgba(2, 0, 136, 0.4);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        #btnRegistro {
+            background: transparent;
+            color: #0056f5;
+            border: 1px solid #009bf5;
+        }
+
+        #btnRegistro:hover {
+            background: rgba(24, 153, 192, 0.336);
+        }
+
+        #btnLogin {
+            background: #009bf5;
+            color: white;
+        }
+
+        #btnLogin:hover {
+            background: #0072f5;
+        }

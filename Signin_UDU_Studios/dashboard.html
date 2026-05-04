@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDU Studios | Configuración finalizada</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle, #0c002b 0%, #02001b 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .dashboard-card {
+            background: #00021b;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #000000;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 245, 233, 0.2);
+            width: 400px;
+        }
+        h1 { color: #3cb17a; text-transform: uppercase; letter-spacing: 2px; }
+        .user-info { font-size: 1.2rem; margin: 20px 0; color: #e6f3ff; }
+        #username-display { color: #0051ff; font-weight: bold; }
+        .status { color: #e6f3ff; font-size: 0.9rem; }
+        p { color: #e6f3ff; font-size: 0.8rem; }
+        .advertence { margin-top: 20px; }
+        
+        button {
+            background: #2aa768;
+            color: #beffe4;
+            border: 1px solid #1c867e;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+        button:hover { background: rgb(51, 192, 133); }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-card">
+        <h1>¡Has accedido correctamente a UDU Studios!</h1>
+        <div class="user-info">
+            Bienvenido, <span id="username-display">Cargando...</span>
+        </div>
+        <p class="status">● Cuenta creada correctamente |<br> Puedes salir o tocando el botón "Cerrar página"</p>
+        <button onclick="window.location.href='../index.html'">Cerrar Página</button><br>
+        <p class="advertence">Al tocar el botón serás redireccionado a https://universe-dynamics-unity.github.io/UDU_StudiosWeb/</p>
+    </div>
+
+   <script type="module">
+        import { auth, db } from './firebase_config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+        // 1. Verificar si hay sesión activa
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // 2. Traer el nombre de usuario cool desde Firestore
+                const docRef = doc(db, "usuarios", user.uid);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    document.getElementById('username-display').innerText = userData.nombreUsuario;
+
+                    // --- VERIFICACIÓN SILENCIOSA DE SUPERUSUARIO ---
+                    if (userData.rango === "UDU_Studios-Account") {
+                        console.log("------------------------------------------");
+                        console.log("ACCEDIÓ: UDU_Studios-Account");
+                        console.log("RANGO: Compañía UDU Studios");
+                        console.log("PRIVILEGIOS: Control Total de los Proyectos UDU Studios");
+                        console.log("------------------------------------------");
+                    }
+                } else {
+                    document.getElementById('username-display').innerText = "Usuario Desconocido";
+                }
+            } else {
+                // Si no hay usuario, mandarlo al login principal para que no se cuele nadie
+                window.location.href = "./index.html";
+            }
+        });
+    </script>
+</body>
+</html>

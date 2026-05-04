@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lección 2 : UDU-APB</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body class="lesson-page">
+    <header>
+        <a href="../index.html">← Salir para repasar</a>
+        <h1 style="margin-top:20px;">Lección 2: Mini-Test de Dynamics</h1>
+    </header>
+
+    <main class="content-card">
+        <p>Responde correctamente para desbloquear el progreso:</p>
+        
+        <div id="test-container" style="margin-top: 15px;">
+            <p><strong>1. ¿Cuál es la función principal de HTML?</strong></p>
+            
+            <label style="display: block; margin: 10px 0;">
+                <input type="radio" name="pregunta" value="incorrecto"> Darle color y estilo.
+            </label>
+            <label style="display: block; margin: 10px 0;">
+                <input type="radio" name="pregunta" value="correcto"> Definir la estructura y el contenido.
+            </label>
+            
+            <button class="btn-primary" onclick="validarLeccion2()" style="margin-top: 10px;">
+                Verificar Respuesta
+            </button>
+        </div>
+
+        <section id="seccion-final" style="display: none; margin-top: 30px;">
+            <div style="background: var(--accent-green); color: white; padding: 10px; border-radius: 8px;">
+                ⭐ ¡Test aprobado!
+            </div>
+            <button class="btn-primary" onclick="finalizarSimple(2)" style="margin-top:10px;">
+                ✅ Finalizar y Guardar Lección
+            </button>
+        </section>
+    </main>
+
+    <script src="../script.js"></script>
+    <script>
+        function validarLeccion2() {
+            const res = document.querySelector('input[name="pregunta"]:checked');
+            if (res && res.value === "correcto") {
+                document.getElementById('seccion-final').style.display = 'block';
+                document.getElementById('test-container').style.display = 'none';
+            } else {
+                alert("Incorrecto. ¡Repasa la teoría!");
+            }
+        }
+        function finalizarSimple(id) {
+            completarLeccion(id); // Llama a la función global de script.js
+            window.location.href = "../index.html";
+        }
+    </script>
+</body>
+</html>
