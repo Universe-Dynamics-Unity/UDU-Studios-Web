@@ -69,20 +69,36 @@ onAuthStateChanged(auth, async (user) => {
                 }
             };
 
-            // --- FUNCIÓN: BORRAR CUENTA ---
+            // --- FUNCIÓN: BORRAR CUENTA TOTAL ---
             document.getElementById('btn-delete-account').onclick = async () => {
-                const confirmacion = confirm("¿En serio vas a borrar la cuenta? No hay vuelta atrás.");
-                if (confirmacion) {
-                    try {
-                        await deleteDoc(docRef); // Borra de la base de datos
-                        await deleteUser(user);  // Borra del sistema de autenticación
-                        alert("Cuenta borrada.");
-                        window.location.href = "../../index.html";
-                    } catch (error) {
-                        alert("Error: Debes haber iniciado sesión hace poco para hacer esto.");
+            const confirmacion = confirm("¿Estás seguro? Se borrará tu progreso y tu identidad en UDU Studios.");
+    
+            if (confirmacion) {
+                try {
+                    const user = auth.currentUser; // Obtenemos el usuario actual directamente
+                    const docRef = doc(db, "usuarios", user.uid);
+
+                    // 1. Borramos el documento de Firestore primero
+                    await deleteDoc(docRef); 
+                    console.log("Datos de usuario eliminados de la base de datos.");
+
+                    // 2. Borramos al usuario de Authentication
+                    await deleteUser(user); 
+                    console.log("Identidad eliminada del sistema.");
+
+                    alert("Cuenta eliminada por completo. ¡Esperamos volver a verte!");
+                    window.location.href = "../../index.html";
+
+                } catch (error) {
+                    console.error("Error al borrar:", error);
+                    if (error.code === 'auth/requires-recent-login') {
+                        alert("Por seguridad, debes cerrar sesión e iniciar sesión de nuevo antes de borrar tu cuenta.");
+                    } else {
+                        alert("Hubo un problema al borrar la cuenta. Inténtalo de nuevo.");
                     }
                 }
-            };
+            }
+        };
 
             document.getElementById('loader').style.display = 'none';
             document.getElementById('profile-content').style.display = 'block';
