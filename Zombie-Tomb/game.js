@@ -204,6 +204,12 @@ function preload() {
     this.load.image('player_down',  rutaBase + prefijo + 'down.png');
     this.load.image('player_left',  rutaBase + prefijo + 'left.png');
     this.load.image('player_right', rutaBase + prefijo + 'right.png');
+
+    // Forzamos la carga con la ruta exacta
+    this.load.image('img_moneda', 'assets/items/money.png');
+    this.load.image('img_punto', 'assets/items/point.png');
+    this.load.image('img_portal', 'assets/items/portal.png');
+
 }
 
 function create() {
@@ -225,7 +231,7 @@ function create() {
     this.monedas = this.physics.add.group();
     this.puntos = this.physics.add.group();
     this.zombies = this.physics.add.group();
-    this.falsos = this.physics.add.group()
+    this.falsos = this.physics.add.group();
     this.score = 0; // Inicializamos el puntaje
 
     let spawnX = 36; 
@@ -242,44 +248,63 @@ function create() {
                 let muro = this.add.rectangle(posX, posY, tileSize, tileSize, 0x4a0080);
                 this.muros.add(muro);
             } else if (valor === "0") {
-                let punto = this.add.circle(posX, posY, 4, 0xffff00);
+                let punto = this.puntos.create(posX, posY, 'img_punto');
+                // Escala y tamaño perfectos
+                punto.setDisplaySize(15, 15); 
+                punto.body.setCircle(6);
+                punto.body.setOffset(4, 4);
+                
+                // Aseguramos que se queden fijas en el mapa
+                punto.setScrollFactor(1); 
                 this.puntos.add(punto);
             } else if (valor === "o") {
+                // Espacio vacío, no hace nada
             } else if (valor === "Z") {
                 crearPatrullero(this, posX, posY, 100); 
             } else if (valor === "m") {
-                let moneda = this.add.circle(posX, posY, 6, 0xffb300);
-                this.monedas.add(moneda);
+                let moneda = this.monedas.create(posX, posY, 'img_moneda');
+
+                // Escala y tamaño perfectos
+                moneda.setDisplaySize(24, 24); 
+                moneda.body.setCircle(6);
+                moneda.body.setOffset(6, 6);
+                
+                // Aseguramos que se queden fijas en el mapa
+                moneda.setScrollFactor(1); 
             } else if (valor === 'P') {
-            // ¡Aquí está el truco! 
-            // Guardamos la posición donde pusiste la P en el JSON
-            spawnX = posX;
-            spawnY = posY;
-            // No creamos ningún objeto físico aquí para que actúe como "o" (espacio vacío)
+                // Guardamos la posición del spawn del jugador
+                spawnX = posX;
+                spawnY = posY;
             } else if (valor === 'f') {
-                // 1. Usamos una imagen que YA exista para evitar el cuadro verde (muro)
-    // 2. Le bajamos el alpha a 0 para que sea invisible
-    let sensor = this.falsos.create(posX, posY, 'muro').setAlpha(0);
-    
-    // 3. ¡EL TRUCO! Hacemos el sensor minúsculo (4x4 píxeles) 
-    // y lo centramos para que no se active por error
-    sensor.body.setSize(4, 4);
-    sensor.body.setOffset(10, 10);
-                } else if (valor === "S") {
-                let portal = this.add.rectangle(posX, posY, tileSize, tileSize, 0x00ffff);
-                this.portales.add(portal); 
-    
-            // Animación de brillo (opcional pero se ve genial)
-            this.tweens.add({
-                targets: portal,
-                alpha: 0.5,
-                duration: 500,
-                yoyo: true,
-                repeat: -1
-            });
-          };
+                // Creamos el bloque invisible (trampa) usando un rectángulo nativo de Phaser
+                let sensor = this.falsos.create(posX, posY, null);
+                sensor.setVisible(false); // Lo hacemos invisible al inicio
+                
+                // Ajustamos la hitbox física para que sea muy pequeña en el centro
+                sensor.body.setSize(4, 4);
+                sensor.body.setOffset(10, 10);
+            } else if (valor === "S") {
+    // 1. Creamos el portal usando tu imagen 'img_portal'
+    // Lo creamos directamente en el grupo de portales para que tenga físicas
+    let portal = this.portales.create(posX, posY, 'img_portal');
+
+    // 2. Ajustamos el tamaño para que encaje en el tile (24x24)
+    portal.setDisplaySize(24, 24);
+
+    // 3. Opcional: Ajustar el hitbox del portal si quieres que sea más preciso
+    portal.body.setSize(20, 20);
+
+    // 4. Tu animación de brillo (la mantenemos igual, ¡funciona perfecto con imágenes!)
+    this.tweens.add({
+        targets: portal,
+        alpha: 0.5,
+        duration: 500,
+        yoyo: true,
+        repeat: -1
+    });
+}
         });
-     });
+    });
 
     // Calculamos el ancho y alto real del mapa basado en tu array
     const mapaAncho = datosNivel.mapa[0].split(',').length * tileSize;
@@ -290,34 +315,26 @@ function create() {
     this.cameras.main.setBounds(0, 0, mapaAncho, mapaAlto);
 
     // --- 3. CREAR AL JUGADOR EN EL LUGAR DE LA "P" ---
-    // Ahora usamos las variables que se actualizaron durante el ciclo del mapa
     this.player = this.physics.add.sprite(spawnX, spawnY, 'player_idle');
 
-// 1. ESCALA GRANDE
-this.player.setScale(1); 
+    // Escala e Hitbox minúsculo
+    this.player.setScale(1); 
+    this.player.body.setSize(22, 22); 
 
-// 2. EL TRUCO: Hitbox minúsculo en el centro
-// Hacemos que la zona de choque sea de solo 40x40 píxeles.
-// Esto es mucho más pequeño que los pasillos, así que NUNCA se trabará.
-this.player.body.setSize(22, 22); 
+    // Centrado perfecto
+    this.player.body.setOffset(
+        (this.player.width - this.player.body.width) / 2,
+        (this.player.height - this.player.body.height) / 2
+    );
 
-// 3. CENTRADO PERFECTO:
-// Esta fórmula pone el cuadro morado exactamente en el centro del dibujo grande.
-this.player.body.setOffset(
-    (this.player.width - this.player.body.width) / 2,
-    (this.player.height - this.player.body.height) / 2
-);
+    // Cámara sigue al jugador de forma suave (lerp)
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
-// La cámara sigue al jugador
-// true: redondea píxeles para que no se vea borroso
-// 0.1, 0.1: es el "lerp" (el retraso suave que querías)
-this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+    const miZoom = 1.5;
+    this.cameras.main.setZoom(miZoom);
 
-const miZoom = 1.5;
-this.cameras.main.setZoom(miZoom);
-
-this.player.setCollideWorldBounds(true);
-this.cameras.main.setRoundPixels(true);
+    this.player.setCollideWorldBounds(true);
+    this.cameras.main.setRoundPixels(true);
 
     // --- 4. COLISIONES DEL JUGADOR ---
     this.physics.add.collider(this.player, this.muros);
@@ -328,85 +345,78 @@ this.cameras.main.setRoundPixels(true);
         this.scene.restart();
     }, null, this);
 
-    this.physics.add.overlap(this.player, this.puntos, (player, punto) => { punto.destroy();
-    
-    // 1. Sumar al progreso global (el que se guarda)
-    progreso.puntos = parseInt(progreso.puntos) + 1;
-    
-    // 2. Guardar en el navegador para que no se pierda
-    localStorage.setItem('udu_puntos', progreso.puntos);
-    
-    // 3. Actualizar los DOS textos: el de la pantalla y el del menú
-    this.scoreText.setText('Puntos: ' + progreso.puntos);
-    document.getElementById('total-points').innerText = progreso.puntos;
-    
-    console.log("Puntos totales guardados:", progreso.puntos);
+    this.physics.add.overlap(this.player, this.puntos, (player, punto) => { 
+        punto.destroy();
+        
+        // Sumar al progreso global
+        progreso.puntos = parseInt(progreso.puntos) + 1;
+        localStorage.setItem('udu_puntos', progreso.puntos);
+        
+        // Actualizar interfaz
+        this.scoreText.setText('Puntos: ' + progreso.puntos);
+        document.getElementById('total-points').innerText = progreso.puntos;
+        
+        console.log("Puntos totales guardados:", progreso.puntos);
     }, null, this);
     
-    this.physics.add.overlap(this.player, this.monedas, (player, monedas) => { monedas.destroy();
-    
-    // 1. Sumar al progreso global (el que se guarda)
-    progreso.monedas = parseInt(progreso.monedas) + 1;
-    
-    // 2. Guardar en el navegador para que no se pierda
-    localStorage.setItem('udu_monedas', progreso.monedas);
-    
-    // 3. Actualizar los DOS textos: el de la pantalla y el del menú
-    this.textoMonedas.setText('Monedas: ' + progreso.monedas);
-    
-    console.log("Monedas totales recogidas:", progreso.monedas);
+    this.physics.add.overlap(this.player, this.monedas, (player, moneda) => { 
+        moneda.destroy();
+        
+        // Sumar al progreso global de monedas
+        progreso.monedas = parseInt(progreso.monedas) + 1;
+        localStorage.setItem('udu_monedas', progreso.monedas);
+        
+        // Actualizar interfaz
+        this.textoMonedas.setText('Monedas: ' + progreso.monedas);
+        
+        console.log("Monedas totales recogidas:", progreso.monedas);
     }, null, this);
 
     this.physics.add.overlap(this.player, this.portales, () => {
-    // 1. Si pasamos el nivel más alto que teníamos, desbloqueamos el siguiente
-    if (currentLevel === parseInt(progreso.nivelMax)) {
-        progreso.nivelMax++;
-        localStorage.setItem('udu_nivelMax', progreso.nivelMax);
-    }
+        if (currentLevel === parseInt(progreso.nivelMax)) {
+            progreso.nivelMax++;
+            localStorage.setItem('udu_nivelMax', progreso.nivelMax);
+        }
 
-    // 2. Mensaje de victoria
-    alert("¡Nivel completado!");
+        alert("¡Nivel completado!");
 
-    // 3. Regresar al selector de niveles
-    this.scene.stop(); // Reinicia Phaser para el próximo nivel
-    document.getElementById('level-selector').style.display = 'flex';
-    renderizarNiveles(); // Actualiza los botones (para que el nuevo nivel ya no sea gris)
+        this.scene.stop(); 
+        document.getElementById('level-selector').style.display = 'flex';
+        renderizarNiveles(); 
     }, null, this);
 
-    // Detectar deslizamiento en pantalla táctil
+    // Detectar deslizamiento en pantalla táctil (Swipe)
     this.input.on('pointerup', (pointer) => {
-    const swipeThreshold = 50; // Distancia mínima para detectar el deslizamiento
-    const distX = pointer.upX - pointer.downX;
-    const distY = pointer.upY - pointer.downY;
+        const swipeThreshold = 50; 
+        const distX = pointer.upX - pointer.downX;
+        const distY = pointer.upY - pointer.downY;
 
-    // Solo se mueve si el personaje está quieto
-    if (this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0) {
-        if (Math.abs(distX) > Math.abs(distY)) {
-            if (Math.abs(distX) > swipeThreshold) {
-                if (distX > 0) this.player.body.setVelocityX(400); // Derecha
-                else this.player.body.setVelocityX(-400); // Izquierda
-            }
-        } else {
-            if (Math.abs(distY) > swipeThreshold) {
-                if (distY > 0) this.player.body.setVelocityY(400); // Abajo
-                else this.player.body.setVelocityY(-400); // Arriba
+        if (this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0) {
+            if (Math.abs(distX) > Math.abs(distY)) {
+                if (Math.abs(distX) > swipeThreshold) {
+                    if (distX > 0) this.player.body.setVelocityX(400); 
+                    else this.player.body.setVelocityX(-400); 
+                }
+            } else {
+                if (Math.abs(distY) > swipeThreshold) {
+                    if (distY > 0) this.player.body.setVelocityY(400); 
+                    else this.player.body.setVelocityY(-400); 
+                }
             }
         }
-    }
-});
+    });
+
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    // Texto para el puntaje en la esquina (x: 10, y: 10)
+    // Textos de Interfaz (Fijados a la cámara)
     this.scoreText = this.add.text(59, 105, 'Puntos: ' + progreso.puntos, {
-    fontSize: '18px',
-    fill: '#ffffff',
-    fontFamily: 'Arial',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: { x: 5, y: 5 }
+        fontSize: '18px',
+        fill: '#ffffff',
+        fontFamily: 'Arial',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        padding: { x: 5, y: 5 }
     });
-    this.scoreText.setScrollFactor(0); // Para que el texto no se mueva si la cámara se mueve
-    this.scoreText.setDepth(100);     // Para que siempre esté encima de todo
-    this.scoreText.setScale(1 / miZoom);
+    this.scoreText.setScrollFactor(0).setDepth(100).setScale(1 / miZoom);
 
     this.textoMonedas = this.add.text(59, 120, 'Monedas: ' + progreso.monedas, {
         fontSize: '18px',
@@ -415,11 +425,9 @@ this.cameras.main.setRoundPixels(true);
         backgroundColor: 'rgba(0,0,0,0.5)',
         padding: { x: 5, y: 5 },
     });
-    this.textoMonedas.setScrollFactor(0); // Para que el texto no se mueva si la cámara se mueve
-    this.textoMonedas.setDepth(100);     // Para que siempre esté encima de todo
-    this.textoMonedas.setScale(1 / miZoom);
+    this.textoMonedas.setScrollFactor(0).setDepth(100).setScale(1 / miZoom);
 
-    // --- BOTÓN DE ABANDONAR (DENTRO DEL JUEGO) ---
+    // --- BOTÓN DE ABANDONAR ---
     this.btnAbandonar = this.add.text(300, 105, '✕ ABANDONAR', {
         fontSize: '16px',
         fill: '#ff4d4d',
@@ -429,12 +437,9 @@ this.cameras.main.setRoundPixels(true);
         padding: { x: 8, y: 5 }
     });
 
-    // Lo fijamos a la cámara y lo ponemos a la derecha
-    this.btnAbandonar.setScrollFactor(0).setDepth(100).setOrigin(1, 0);
+    this.btnAbandonar.setScrollFactor(0).setDepth(100).setOrigin(1, 0).setScale(1 / miZoom);
     this.btnAbandonar.setInteractive({ useHandCursor: true });
-    this.btnAbandonar.setScale(1 / miZoom);
 
-    // Efectos visuales al pasar el mouse
     this.btnAbandonar.on('pointerover', () => {
         this.btnAbandonar.setStyle({ fill: '#ffffff', backgroundColor: '#ff0000' });
     });
@@ -442,39 +447,29 @@ this.cameras.main.setRoundPixels(true);
         this.btnAbandonar.setStyle({ fill: '#ff4d4d', backgroundColor: 'rgba(0,0,0,0.6)' });
     });
 
-    // Acción al hacer clic
     this.btnAbandonar.on('pointerdown', () => {
         if (confirm("¿Seguro que quieres abandonar? No se guardará el progreso.")) {
-            // Regresamos al selector de niveles sin guardar progreso extra
             this.scene.stop();
             document.getElementById('level-selector').style.display = 'flex';
             renderizarNiveles();
         }
     });
-    // --- LÓGICA DE TRAMPA DEFINITIVA (SIN CUADROS VERDES) ---
-this.physics.add.overlap(this.player, this.falsos, (player, sensor) => {
-    // 1. Le ponemos la imagen del muro de verdad
-    this.add.rectangle(posX, posY, tileSize, tileSize, 0x4a0080);
-    this.muros.add(muro);
-    
-    // 2. Lo hacemos visible (quitamos la transparencia)
-    sensor.setAlpha(1);
 
-    // 3. ¡EL PASO CLAVE! Lo volvemos sólido
-    // Sacamos al sensor del grupo de "falsos" y lo metemos a "muros"
-    this.falsos.remove(sensor);
-    this.muros.add(sensor);
+    // --- LÓGICA DE TRAMPA DEFINITIVA (Fórmula UDU Studios) ---
+    this.physics.add.overlap(this.player, this.falsos, (player, sensor) => {
+        // 1. Dibujamos un rectángulo de muro real encima del sensor que se pisó
+        let muroVisual = this.add.rectangle(sensor.x, sensor.y, tileSize, tileSize, 0x4a0080);
+        
+        // 2. Añadimos ese nuevo objeto visual al grupo estático de muros sólidos
+        this.muros.add(muroVisual);
+        
+        // 3. Eliminamos el sensor invisible para que no vuelva a activarse dos veces
+        sensor.destroy();
 
-    // 4. Actualizamos el cuerpo físico para que bloquee al jugador
-    // Esto hace que el cuadro de debug morado se vuelva verde (sólido)
-    sensor.body.setImmovable(true);
-    sensor.body.setSize(24, 24); // Recupera su tamaño real de pared
-    sensor.body.setOffset(0, 0);
-
-    // 5. El efecto de UDU Studios
-    this.cameras.main.flash(100, 255, 0, 0, 0.2); 
-    console.log("¡Trampa convertida en muro real!");
-});
+        // 4. Feedback en pantalla para asustar al jugador
+        this.cameras.main.flash(100, 255, 0, 0, 0.2); 
+        console.log("¡Trampa activada! El pasillo se ha cerrado.");
+    });
 }
     
 function update() {

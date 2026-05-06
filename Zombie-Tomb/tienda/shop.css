@@ -93,12 +93,37 @@ button:disabled {
     cursor: not-allowed; /* Cambia el mouse si no tienes monedas */
 }
 
-#btn-back {
+#btn-back2 {
     margin-top: 30px;
     background: #ff4d4d;
     color: white;
     width: 100%;
     max-width: 300px;
+}
+
+/* Esto aplica para el menú y para la tienda */
+#main-menu, #shop-container {
+    height: 100%;           /* Ocupa todo el alto disponible */
+    width: 100%;            /* Ocupa todo el ancho */
+    overflow-y: auto;       /* ¡ESTA ES LA MAGIA! Activa el scroll vertical solo si es necesario */
+    overflow-x: hidden;     /* Evita que se mueva hacia los lados */
+    
+    /* Alineación para que el scroll no "coma" el título */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* IMPORTANTE: Usar flex-start para que empiece desde arriba */
+    padding-top: 40px;      /* Espacio extra arriba para que el título respire */
+    padding-bottom: 40px;   /* Espacio abajo para que los últimos créditos se vean bien */
+    
+    /* Suavizado de scroll (opcional) */
+    scroll-behavior: smooth;
+}
+
+/* --- TRUCO PREMIUM: Esconder la barra de scroll pero que siga funcionando --- */
+#main-menu::-webkit-scrollbar, 
+#shop-container::-webkit-scrollbar {
+    display: none; /* Se verá mucho más limpio en celulares y PC */
 }
 
 /* --- ADAPTACIÓN A PANTALLAS GRANDES (PC / Tablets) --- */

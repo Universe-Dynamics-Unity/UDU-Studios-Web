@@ -6,11 +6,11 @@ let skinsCompradas = JSON.parse(localStorage.getItem('udu_skins')) || ['default'
 
 // 2. Definimos los productos de la tienda (Catálogo de UDU Studios)
 const catalogo = [
-    { id: 'skin_blue', nombre: 'Skin Azul', precio: 50, img: '../assets/textures-shop/miniaturas/skin-blue-miniatura.png' },
-    { id: 'skin_red', nombre: 'Skin Roja', precio: 50, img: '../assets/textures-shop/miniaturas/skin-red-miniatura.png' },
-    { id: 'skin_purple', nombre: 'Skin Morada', precio: 50, img: '../assets/textures-shop/miniaturas/skin-purple-miniatura.png' },
-    { id: 'skin_multicolor1', nombre: 'Skin Multicolor 1', precio: 65, img: '../assets/textures-shop/miniaturas/skin-multicolor1-miniatura.png' },
-    { id: 'protection', nombre: 'Protección', precio: 150, img: '../assets/textures-shop/miniaturas/escudo-miniatura.png' }
+    { id: 'skin_blue', nombre: 'Skin Azul', precio: 50, img: 'assets/textures-shop/miniaturas/skin-blue-miniatura.png' },
+    { id: 'skin_red', nombre: 'Skin Roja', precio: 50, img: 'assets/textures-shop/miniaturas/skin-red-miniatura.png' },
+    { id: 'skin_purple', nombre: 'Skin Morada', precio: 50, img: 'assets/textures-shop/miniaturas/skin-purple-miniatura.png' },
+    { id: 'skin_multicolor1', nombre: 'Skin Multicolor 1', precio: 65, img: 'assets/textures-shop/miniaturas/skin-multicolor1-miniatura.png' },
+    { id: 'protection', nombre: 'Protección', precio: 150, img: 'assets/textures-shop/miniaturas/escudo-miniatura.png' }
 ];
 
 function renderizarTienda() {
@@ -141,3 +141,15 @@ renderizarTienda();
 
 // 2. Esto es para que el botón de "Volver" funcione si lo haces por JS
 console.log("Tienda de Zombie Tomb cargada correctamente");
+
+function volverAlMenu() {
+    // 1. Ocultamos el selector de niveles
+    document.getElementById('shop-container').style.display = 'none';
+    
+    // 2. IMPORTANTE: Mostramos el menú con 'flex' para que respete tu CSS
+    const mainMenu = document.getElementById('main-menu');
+    mainMenu.style.display = 'block';
+    
+    // 3. Opcional: Reseteamos el scroll por si acaso
+    mainMenu.scrollTop = 0;
+}
