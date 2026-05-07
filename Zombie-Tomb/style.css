@@ -254,3 +254,297 @@ body {
 .p-purple {
     color: var(--neon-pink);
 }
+
+/* Estilo especial para el botón de sesión UDU */
+.login-style {
+    background: linear-gradient(135deg, #4a0080 0%, #2a0052 100%);
+    border: 2px solid var(--neon-pink) !important;
+    box-shadow: 0 0 15px rgba(212, 0, 255, 0.4);
+    margin-bottom: 20px !important;
+    font-size: 0.9rem !important;
+}
+
+.login-style:hover {
+    box-shadow: 0 0 25px var(--neon-pink);
+    transform: scale(1.05);
+}
+
+/* Para cuando ya inició sesión, podemos ponerlo en rojo si quiere cerrar sesión */
+.logged-in {
+    border-color: var(--amarillo-udu) !important;
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);
+}
+
+/* --- DISEÑO BASE (Mobile First) --- */
+body {
+    background-color: #1a0033; /* Estilo Dark Mode */
+    color: white;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+#shop-container {
+    width: 100%; /* Ocupa toda la pantalla en celulares */
+    max-width: 600px; /* Pero no se hace gigante en PC */
+    min-height: 100vh;
+    background: #2a0052;
+    padding: 20px;
+    box-sizing: border-box; /* Evita que el padding rompa la pantalla */
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+header h1 {
+    color: #ffcc00;
+    text-shadow: 2px 2px #8800e2;
+    font-size: 2.2em;
+    margin-top: 10px;
+}
+
+#coin-status {
+    background: rgba(0,0,0,0.3);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+/* --- GRID RESPONSIVO --- */
+#items-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 1 sola columna en celulares */
+    gap: 15px;
+}
+
+.shop-item {
+    background: #3d007a;
+    border: 2px solid #8800e2;
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.2s;
+}
+
+.shop-item:hover {
+    transform: scale(1.02);
+}
+
+.shop-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain; /* Evita que la imagen se deforme */
+}
+
+.item-info h3 {
+    margin: 10px 0 5px 0;
+}
+
+.item-info p {
+    margin: 0 0 15px 0;
+    color: #ffcc00;
+    font-weight: bold;
+}
+
+button {
+    background: #ffcc00;
+    color: #3d007a;
+    border: none;
+    padding: 14px 20px; /* Botones más gorditos, ideales para tocar en pantallas táctiles */
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    width: 100%;
+    max-width: 250px;
+}
+
+button:disabled {
+    background: #555;
+    color: #888;
+    cursor: not-allowed; /* Cambia el mouse si no tienes monedas */
+}
+
+#btn-back2 {
+    margin-top: 30px;
+    background: #ff4d4d;
+    color: white;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Esto aplica para el menú y para la tienda */
+#main-menu, #shop-container {
+    height: 100%;           /* Ocupa todo el alto disponible */
+    width: 100%;            /* Ocupa todo el ancho */
+    overflow-y: auto;       /* ¡ESTA ES LA MAGIA! Activa el scroll vertical solo si es necesario */
+    overflow-x: hidden;     /* Evita que se mueva hacia los lados */
+    
+    /* Alineación para que el scroll no "coma" el título */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* IMPORTANTE: Usar flex-start para que empiece desde arriba */
+    padding-top: 40px;      /* Espacio extra arriba para que el título respire */
+    padding-bottom: 40px;   /* Espacio abajo para que los últimos créditos se vean bien */
+    
+    /* Suavizado de scroll (opcional) */
+    scroll-behavior: smooth;
+}
+
+/* --- TRUCO PREMIUM: Esconder la barra de scroll pero que siga funcionando --- */
+#main-menu::-webkit-scrollbar, 
+#shop-container::-webkit-scrollbar {
+    display: none; /* Se verá mucho más limpio en celulares y PC */
+}
+
+/* Contenedor del botón de acceso */
+#auth-section {
+    position: fixed; /* Se queda pegado a la pantalla */
+    top: 35px;       /* Distancia desde arriba */
+    right: 20px;     /* Distancia desde la derecha */
+    z-index: 9999;   /* Para que siempre esté por encima de todo lo demás */
+}
+
+/* Estilo base del botón/link */
+#login-link {
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 2px solid #ffee00;
+    color: #ffee00;
+    min-width: 120px; /* Le da un espacio base para que no se vea cortado */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #070116;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+/* Efecto Hover */
+#login-link:hover {
+    background: rgb(255, 238, 0);
+    color: #7300df;
+    transform: scale(1.05);
+}
+
+/* Clase especial para cuando el usuario está logueado */
+.user-active {
+    border-color: #3cb17a !important; /* Verde UDU */
+    color: #3cb17a !important;
+    background: rgba(60, 177, 122, 0.1) !important;
+    box-shadow: 0 0 15px rgba(60, 177, 122, 0.4) !important;
+    animation: neon-pulse 2s infinite;
+}
+
+@keyframes neon-pulse {
+    0% { box-shadow: 0 0 5px rgba(60, 177, 122, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(60, 177, 122, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(60, 177, 122, 0.4); }
+}
+
+/* --- NUEVOS ESTILOS DE CARGA Y VERIFICACIÓN --- */
+
+/* El circulito de carga */
+.loader {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #00d4ff;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Color azul para usuario normal */
+.user-blue {
+    color: #9b3fd8 !important;
+    border-color: #9b3fd8 !important;
+}
+
+/* Estilo SuperUsuario (Meta Verified Style) */
+.verified-badge {
+    color: #00d4ff;
+    text-shadow: 0 0 10px #00d4ff;
+    font-size: 1.1rem;
+}
+
+/* Brillo especial para el SuperUsuario */
+.admin-glow {
+    border-color: #ff00ff !important; /* Un rosa/magenta neón */
+    color: #ff00ff !important;
+    background: rgba(255, 0, 255, 0.1) !important;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.6) !important;
+    animation: admin-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes admin-pulse {
+    0% { box-shadow: 0 0 10px rgba(255, 0, 255, 0.4); }
+    50% { box-shadow: 0 0 30px rgba(255, 0, 255, 0.9); }
+    100% { box-shadow: 0 0 10px rgba(255, 0, 255, 0.4); }
+}
+
+/* --- ADAPTACIÓN A PANTALLAS GRANDES (PC / Tablets) --- */
+@media (min-width: 480px) {
+    #items-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas si hay espacio */
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        background-color: #000; /* Fondo negro detrás de la ventana para que resalte */
+    }
+
+    #game-container {
+        /* Definimos la "ventanita" */
+        width: 90vw;   /* Un poco menos del ancho total para que se vea el borde */
+        height: 85vh;  /* Un poco menos del alto total */
+        max-width: 360px; /* Tamaño máximo para que no se vea gigantesco */
+        max-height: 640px;
+        
+        /* Recuperamos el estilo de ventana profesional */
+        border: 3px solid var(--morado-brillante);
+        border-radius: 15px;
+        box-shadow: 0 0 25px rgba(212, 0, 255, 0.4);
+        
+        /* Centramos la ventana en el celular */
+        margin: auto; 
+    }
+
+    /* Ajustamos el tamaño de los textos para que quepan bien en la ventanita */
+    .game-title {
+        font-size: 2.2rem;
+        margin: 20px 0;
+    }
+
+    .menu-button {
+        width: 200px;
+        padding: 12px;
+        font-size: 1rem;
+    }
+
+    .notes-next-update {
+        font-size: 0.75rem;
+        margin: 10px;
+    }
+
+    .back-button {
+        font-size: 0.8rem;
+        padding: 5px 12px;
+    }
+}

@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Zombie Tomb Project - UDU Studios</title>
     <link rel="stylesheet" href="style.css"> 
-    <link rel="stylesheet" href="mobile.css">
-    <link rel="stylesheet" href="tienda/shop.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
 </head>
 <body>
@@ -26,6 +24,13 @@
             </div>
             
             <img src="assets/ui/logo_UDU_Studios-pixelart.png" alt="UDU Studios" class="brand-logo">
+
+        <div id="auth-section">
+        <a href="../Signin_UDU_Studios/index.html" id="login-link" style="min-width: 140px;" onclick="alert('AVISO: Al volver serás redirigido a otro sitio de UDU Studios, no a este.')">
+            <div class="loader"></div> Verificando...
+        </a>
+        </div>
+
         </div>
     </div>
 
@@ -62,7 +67,7 @@
         </footer>
     </div>
 
-    <script src="game.js"></script>
+    <script type="module" src="game.js"></script>
     <script src="tienda/shop.js"></script>
     <script>
         function abrirTienda() {

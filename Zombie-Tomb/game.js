@@ -1,3 +1,61 @@
+import { auth, db } from '../Signin_UDU_Studios/firebase_config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+const loginLink = document.getElementById('login-link');
+
+console.log("🖥️ 1. Iniciando escáner de UDU Studios...");
+
+const authTimeout = setTimeout(() => {
+    if (loginLink.innerText.includes("Verificando")) {
+        resetToLogin();
+        console.warn("⚠️ 2. Tiempo agotado: Firebase no respondió a tiempo.");
+    }
+}, 7000); 
+
+onAuthStateChanged(auth, async (user) => {
+    clearTimeout(authTimeout); // Apagamos el cronómetro de seguridad
+    
+    if (user) {
+        console.log("✅ 3. ¡Usuario detectado en Auth! UID:", user.uid);
+        try {
+            const docRef = doc(db, "usuarios", user.uid);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                console.log("✅ 4. Datos encontrados en la Base de Datos.");
+                const userData = docSnap.data();
+                const nombre = userData.nombreUsuario;
+                
+                if (userData.rango === "UDU_Studios-Account") {
+                    loginLink.innerHTML = `<span class="verified-badge">🔹</span> ${nombre}`;
+                    loginLink.classList.add('admin-glow');
+                } else {
+                    loginLink.innerHTML = `👤 ${nombre}`;
+                    loginLink.classList.add('user-blue');
+                }
+                loginLink.href = "../Signin_UDU_Studios/account/index.html";
+                console.log("🚀 5. Acceso concedido y botón actualizado.");
+            } else {
+                console.warn("❌ 4. El usuario existe, pero NO tiene datos guardados en Firestore.");
+                resetToLogin();
+            }
+        } catch (error) {
+            console.error("❌ 4. Error al conectar con Firestore:", error);
+            resetToLogin();
+        }
+    } else {
+        console.log("🛑 3. No se detectó ninguna sesión activa en este dominio.");
+        resetToLogin();
+    }
+});
+
+function resetToLogin() {
+    loginLink.innerHTML = "Iniciar Sesión";
+    loginLink.classList.remove('user-blue', 'admin-glow');
+    loginLink.href = "../Signin_UDU_Studios/index.html";
+}
+
 // ==========================================
 // CONFIGURACIÓN DE UDU STUDIOS - ZOMBIE TOMB
 // ==========================================
@@ -72,6 +130,81 @@ let progreso = {
     monedas: localStorage.getItem('udu_monedas') || 0, // Valor M (Tienda)
     puntos: localStorage.getItem('udu_puntos') || 0,   // Valor 0 (Puntaje)
 };
+
+// Esto detecta en automático cuando el usuario entra al sitio
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        cargarDatosDesdeNube(user);
+    }
+});
+
+async function cargarDatosDesdeNube(user) {
+    const userRef = doc(db, "usuarios", user.uid); 
+    const snap = await getDoc(userRef);
+    
+    if (snap.exists() && snap.data()["ZT-data"]) {
+        const cloudData = snap.data()["ZT-data"];
+        
+        // Actualizamos las variables del juego
+        progreso.monedas = cloudData.recolectedCoins;
+        progreso.puntos = cloudData.recolectedPoints;
+        progreso.nivelMax = cloudData.levelsPlayed;
+        
+        // Cargar skins
+        skinsCompradas = ['default'];
+        if (cloudData.shopping.skinRoja) skinsCompradas.push('skin_red');
+        if (cloudData.shopping.skinAzul) skinsCompradas.push('skin_blue');
+        if (cloudData.shopping.skinMorada) skinsCompradas.push('skin_purple');
+        if (cloudData.shopping.skinMulticolor) skinsCompradas.push('skin_multicolor1');
+        
+        // Actualizamos la UI
+        document.getElementById('total-points').innerText = progreso.puntos;
+        renderizarNiveles(); // Actualizamos los candados visuales
+        console.log("Datos de ZT cargados desde la nube.");
+    }
+}
+
+async function sincronizacion() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userRef = doc(db, "usuarios", user.uid);
+    
+    try {
+        const userSnap = await getDoc(userRef);
+        
+        const dataInicialZT = {
+            "ZT-data": {
+                recolectedPoints: 0,
+                recolectedCoins: 0,
+                levelsPlayed: 1,
+                shopping: {
+                    skinRoja: false, skinMorada: false, skinAzul: false, skinMulticolor: false, protection: false
+                }
+            }
+        };
+
+        if (!userSnap.exists() || !userSnap.data()["ZT-data"]) {
+            // Creamos la carpeta ZT-data por primera vez
+            await setDoc(userRef, dataInicialZT, { merge: true });
+        } else {
+            // Actualizamos los datos
+            await updateDoc(userRef, {
+                "ZT-data.recolectedPoints": progreso.puntos,
+                "ZT-data.recolectedCoins": progreso.monedas,
+                "ZT-data.levelsPlayed": progreso.nivelMax,
+                "ZT-data.shopping.skinRoja": skinsCompradas.includes('skin_red'),
+                "ZT-data.shopping.skinAzul": skinsCompradas.includes('skin_blue'),
+                "ZT-data.shopping.skinMorada": skinsCompradas.includes('skin_purple'),
+                "ZT-data.shopping.skinMulticolor": skinsCompradas.includes('skin_multicolor1')
+            });
+        }
+        console.log("¡Progreso guardado en la bóveda de Firebase!");
+    } catch (error) {
+        console.error("Error al guardar:", error);
+    }
+}
+// ------------------------------------
 
 document.getElementById('btn-back-main').onclick = () => {
     // 1. Ocultamos el selector de niveles
@@ -347,36 +480,27 @@ function create() {
 
     this.physics.add.overlap(this.player, this.puntos, (player, punto) => { 
         punto.destroy();
-        
-        // Sumar al progreso global
         progreso.puntos = parseInt(progreso.puntos) + 1;
-        localStorage.setItem('udu_puntos', progreso.puntos);
-        
-        // Actualizar interfaz
+        // YA NO GUARDAMOS AQUÍ PARA NO SATURAR EL SERVIDOR
         this.scoreText.setText('Puntos: ' + progreso.puntos);
         document.getElementById('total-points').innerText = progreso.puntos;
-        
-        console.log("Puntos totales guardados:", progreso.puntos);
     }, null, this);
     
     this.physics.add.overlap(this.player, this.monedas, (player, moneda) => { 
         moneda.destroy();
-        
-        // Sumar al progreso global de monedas
         progreso.monedas = parseInt(progreso.monedas) + 1;
-        localStorage.setItem('udu_monedas', progreso.monedas);
-        
-        // Actualizar interfaz
+        // YA NO GUARDAMOS AQUÍ
         this.textoMonedas.setText('Monedas: ' + progreso.monedas);
-        
-        console.log("Monedas totales recogidas:", progreso.monedas);
     }, null, this);
 
     this.physics.add.overlap(this.player, this.portales, () => {
+        // Aumentamos el nivel si es necesario
         if (currentLevel === parseInt(progreso.nivelMax)) {
             progreso.nivelMax++;
-            localStorage.setItem('udu_nivelMax', progreso.nivelMax);
         }
+
+        // ¡EL JUGADOR GANÓ EL NIVEL! GUARDAMOS TODO EN FIREBASE AHORA
+        sincronizacion();
 
         alert("¡Nivel completado!");
 
@@ -384,7 +508,7 @@ function create() {
         document.getElementById('level-selector').style.display = 'flex';
         renderizarNiveles(); 
     }, null, this);
-
+    
     // Detectar deslizamiento en pantalla táctil (Swipe)
     this.input.on('pointerup', (pointer) => {
         const swipeThreshold = 50; 
@@ -448,7 +572,10 @@ function create() {
     });
 
     this.btnAbandonar.on('pointerdown', () => {
-        if (confirm("¿Seguro que quieres abandonar? No se guardará el progreso.")) {
+        if (confirm("¿Seguro que quieres abandonar? Guardaremos tus puntos y monedas, pero perderás el progreso de este nivel.")) {
+            // Guardamos el dinero y puntos que haya agarrado antes de huir
+            sincronizacion(); 
+            
             this.scene.stop();
             document.getElementById('level-selector').style.display = 'flex';
             renderizarNiveles();
