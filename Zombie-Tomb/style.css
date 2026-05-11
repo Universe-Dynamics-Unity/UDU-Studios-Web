@@ -170,7 +170,7 @@ body {
     position: absolute;
     height: 8px;
     background: #b700ff;
-    width: 2000px; /* Suficiente para 10+ niveles */
+    width: 3200px; /* Suficiente para 10+ niveles */
     z-index: 1;
 }
 
@@ -498,6 +498,83 @@ button:disabled {
     100% { box-shadow: 0 0 10px rgba(255, 0, 255, 0.4); }
 }
 
+.creditos {
+    display: none;
+    position: absolute;
+    z-index: 100;
+    border: #fbff00 3px solid;
+    border-radius: 10px;
+    background: radial-gradient(circle, #2a0052 0%, #1a0033 100%);
+    height: auto;
+    width: 500px;
+    padding: 20px;
+    color: var(--amarillo-udu);
+    text-align: center;
+}
+.creditos-h2 {
+    color: #ffcc00;
+    text-shadow: 2px 2px #8800e2;
+    font-size: 2rem;
+    text-align: center;
+    margin: 20px 0;
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.creditos-pMorado {
+    color: var(--neon-pink);
+}
+
+.U {
+    color: red;
+}
+
+.D {
+    color: orange;
+}
+
+.U2 {
+    color: yellow;
+}
+
+.Studios {
+    color: rgb(42, 192, 130);
+}
+
+.AlanRS {
+    color: #008cff;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: -90px;
+    background: none;
+    border: none;
+    color: #ffff00; /* Color amarillo para que combine */
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.close-btn:active {
+    transform: scale(1.2);
+}
+
+.version-game {
+    position: absolute;
+    color: var(--amarillo-udu);
+    top: 555px;
+    left: 40px;
+    z-index: 9999;
+}
+
+.frase-xd {
+    font-size: 1.2rem;
+}
+
 /* --- ADAPTACIÓN A PANTALLAS GRANDES (PC / Tablets) --- */
 @media (min-width: 480px) {
     #items-grid {
@@ -545,6 +622,15 @@ button:disabled {
 
     .back-button {
         font-size: 0.8rem;
-        padding: 5px 12px;
+        padding: 7px -2px;
+    }
+
+    .creditos {
+        width: 300px;
+        height: 250px;
+    }
+    .version-game {
+        top: 447px;
+        left: 110px;
     }
 }

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zombie Tomb Project - UDU Studios</title>
+    <link rel="icon" href="./icon_zt.png" type="image/png">
+    <title>Zombie Tomb - UDU Studios</title>
     <link rel="stylesheet" href="style.css"> 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
 </head>
@@ -18,18 +19,19 @@
                 <button id="btn-play" class="menu-button">JUGAR</button>
                 <button id="btn-shop" class="menu-button" onclick="abrirTienda()">TIENDA</button>
                 <button id="btn-reset" class="menu-button" style="background-color: #ff4d4d; color: white;">BORRAR PROGRESO</button>
-                <button id="btn-credits" class="menu-button secondary">CRÉDITOS</button>
+                <button id="btn-credits" class="menu-button" onclick="abrirCreditos()">CRÉDITOS</button>
                 
-                <p class="notes-next-update"><span class="p-purple">Notas de la próxima update (1.3)</span>:<br> Se volverá disponible el botón "créditos" y<br> más niveles... próximamente. Esperamos que te haya gustado la update 1.2 :D</p>
+                <p class="notes-next-update"><span class="p-purple">Notas de la próxima update 1.4</span>:<br>
+                    El objeto escudo de la tienda será funcional y agregaremos más niveles<br> próximamente. Esperamos que te haya gustado la <span class="p-purple">versión 1.3</span></7> :D</p>
             </div>
             
             <img src="assets/ui/logo_UDU_Studios-pixelart.png" alt="UDU Studios" class="brand-logo">
 
-        <div id="auth-section">
+   <!-- <div id="auth-section">
         <a href="../Signin_UDU_Studios/index.html" id="login-link" style="min-width: 140px;" onclick="alert('AVISO: Al volver serás redirigido a otro sitio de UDU Studios, no a este.')">
             <div class="loader"></div> Verificando...
         </a>
-        </div>
+        </div> -->
 
         </div>
     </div>
@@ -54,7 +56,7 @@
                 Monedas: <span id="shop-coins">0</span> 🪙<br>
                 Puntos recogidos: <span id="points">0</span> ⭐<br>
                 <button onclick="canjearPuntos()" style="margin-top:10px; padding:5px 10px; font-size:0.6em;">
-                Canjear 100 puntos por 10 🪙
+                <span style="color: var(--neon-pink);">Canjear 300 puntos por 25 🪙</span>
                 </button>
             </div>
         </header>
@@ -62,36 +64,62 @@
         <main id="items-grid">
             </main>
 
+            <p style="color: var(--neon-pink);" class="frase-xd">La inflación, hermano.</p>
+
         <footer>
             <button id="btn-back2" onclick="volverAlMenu()">VOLVER AL MENÚ</button>
         </footer>
+    </div>
+
+    <div class="creditos" style="text-align: center;" id="creditos">
+        <button class="close-btn" onclick="cerrarCreditos()">&times;</button>
+        <h2 class="creditos-h2">Créditos</h2>
+        <p class="creditos-p">¡Esperamos que te haya gustado el juego!</p>
+        <p class="creditos-pMorado">Zombie Tomb - version 1.3</p>
+        <p class="creditos-p">&copy; 2026 <strong>UDU Studios</strong>. Todos los derechos reservados.<br>
+        Desarrollado por <strong><span class="U">U</span><span class="D">D</span><span class="U2">U</span> <span class="Studios">Studios</span></strong> & <strong><strong><span class="AlanRS">Alan R.S</span></strong></p>
+    </div>
+
+    <div class="version-game">
+        <p>Zombie Tomb <span class="p-purple">versión 1.3</span></p>
     </div>
 
     <script type="module" src="game.js"></script>
     <script src="tienda/shop.js"></script>
     <script>
         function abrirTienda() {
-    // Ocultamos el menú y mostramos la tienda
-    document.getElementById('main-menu').style.display = 'none';
-    document.getElementById('shop-container').style.display = 'block';
+            // Ocultamos el menú y mostramos la tienda
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('shop-container').style.display = 'block';
     
-    // Forzamos a que la tienda empiece arriba del todo
-    document.getElementById('shop-container').scrollTop = 0;
+            // Forzamos a que la tienda empiece arriba del todo
+            document.getElementById('shop-container').scrollTop = 0;
     
-    // Cargamos los datos actualizados
-    renderizarTienda();
-}
+            // Cargamos los datos actualizados
+            renderizarTienda();
+        }
 
-function volverAlMenu() {
-    // Ocultamos la tienda y mostramos el menú
-    document.getElementById('shop-container').style.display = 'none';
-    document.getElementById('main-menu').style.display = 'flex';
+        function volverAlMenu() {
+            // Ocultamos la tienda y mostramos el menú
+            document.getElementById('shop-container').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
     
-    // EL TRUCO MÁGICO: Reseteamos el scroll del menú para que el título se vea perfecto
-    const mainMenu = document.getElementById('main-menu');
-    mainMenu.scrollTop = 0;
-    window.scrollTo(0, 0);
-}
+            // EL TRUCO MÁGICO: Reseteamos el scroll del menú para que el título se vea perfecto
+            const mainMenu = document.getElementById('main-menu');
+            mainMenu.scrollTop = 0;
+            window.scrollTo(0, 0);
+        }
+
+        function abrirCreditos() {
+            // Ocultamos la tienda y mostramos el menú
+            document.getElementById('creditos').style.display = 'block';
+
+        }
+
+        function cerrarCreditos() {
+             // Ocultamos la tienda y mostramos el menú
+            document.getElementById('creditos').style.display = 'none';
+        }
     </script>
 
 </body>
