@@ -630,7 +630,6 @@ button:disabled {
         height: 250px;
     }
     .version-game {
-        top: 500px;
-        left: 110px;
+        display: none;
     }
 }
