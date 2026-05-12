@@ -630,6 +630,6 @@ button:disabled {
         height: 250px;
     }
     .version-game {
-        display: none;
+        display: none; /* Quitamos el apartado de "versión del juego" para que no estorbe en celulares */
     }
 }

@@ -79,17 +79,29 @@ function renderizarTienda() {
 }
 
 function comprar(id, precio) {
-    if (monedasActuales >= precio) {
-        // Restamos las monedas y guardamos el item
-        monedasActuales -= precio;
-        skinsCompradas.push(id);
-        
-        // ¡SUPER IMPORTANTE! Guardamos de vuelta usando el mismo nombre que en game.js
-        localStorage.setItem('udu_monedas', monedasActuales);
-        localStorage.setItem('udu_skins', JSON.stringify(skinsCompradas));
-        
-        alert("¡Compra exitosa!");
+   if (monedasActuales >= precio) {
+        if (id === 'protection') {
+            // Lógica de acumulado
+            let cantidadEscudos = parseInt(localStorage.getItem('udu_escudos_inventario')) || 0;
+            cantidadEscudos += 1;
+            localStorage.setItem('udu_escudos_inventario', cantidadEscudos);
+            
+            monedasActuales -= precio;
+            localStorage.setItem('udu_monedas', monedasActuales);
+            
+            alert(`🛡️ ¡Escudo comprado! Tienes ${cantidadEscudos} en tu inventario.`);
+        } else {
+            // Lógica normal para skins...
+            if (!skinsCompradas.includes(id)) {
+                skinsCompradas.push(id);
+                monedasActuales -= precio;
+                localStorage.setItem('udu_monedas', monedasActuales);
+                localStorage.setItem('udu_skins', JSON.stringify(skinsCompradas));
+            }
+        }
         renderizarTienda();
+    } else {
+        alert("❌ No tienes suficientes monedas.");
     }
 }
 
@@ -107,7 +119,9 @@ function canjearPuntos() {
 
         // Actualizamos la tienda para que se vea el cambio
         renderizarTienda();
-        alert("¡Canje de monedas exitoso!");
+        alert("¡Canje de monedas exitoso! Para guardar los cambios correctamente refresca la página.");
+        renderizarTienda();
+
     } else {
         alert("¡Te faltan puntos! Sigue jugando para ganar más.");
     }
@@ -122,7 +136,9 @@ function equiparSkin(id) {
     } else {
         alert("Este objeto es un potenciador y se activa solo en el nivel.");
     }
+    location.reload()
 }
+
 function desequiparSkin() {
     // Volvemos al estado inicial
     localStorage.setItem('udu_skin_equipada', 'default');
@@ -132,6 +148,7 @@ function desequiparSkin() {
     
     // Refrescamos la interfaz de la tienda
     renderizarTienda();
+    location.reload()
 }
 
 // Iniciar al cargar la página

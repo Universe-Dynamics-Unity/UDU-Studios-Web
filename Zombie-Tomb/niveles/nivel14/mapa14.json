@@ -1,0 +1,26 @@
+{
+    "nivel": 14,
+    "nombre": "Nivel 14 - Preparación",
+    "mapa": [
+        "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1",
+        "1,o,o,o,o,o,o,o,o,o,o,o,o,1,o,o,1",
+        "1,o,P,o,o,o,o,o,o,o,o,o,o,1,o,S,1",
+        "1,1,1,1,o,o,o,o,o,o,o,o,o,1,o,o,1",
+        "1,o,o,1,o,o,o,o,o,o,o,o,o,o,o,o,1",
+        "1,o,o,1,o,o,o,o,o,o,o,o,o,o,o,o,1",
+        "1,o,o,o,o,o,o,o,o,o,1,1,o,o,o,o,1",
+        "1,o,o,o,1,o,o,o,o,o,o,o,o,o,o,o,1",
+        "1,o,o,o,1,1,o,o,o,o,o,o,Z,1,o,o,1",
+        "1,o,o,o,o,o,o,o,o,o,o,o,o,o,1,1,1",
+        "1,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,1",
+        "1,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,1",
+        "1,o,o,o,o,o,o,o,o,o,o,o,o,o,o,Z,1",
+        "1,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,1",
+        "1,o,o,1,Z,o,o,o,o,o,o,o,o,o,o,o,1",
+        "1,o,o,1,o,o,o,o,o,o,o,o,o,o,o,o,1",
+        "1,o,o,o,o,o,o,o,o,o,o,o,1,o,o,o,1",
+        "1,1,1,o,o,o,o,o,o,o,o,o,o,o,o,o,1",
+        "1,o,o,o,o,o,o,o,o,o,o,o,o,o,1,1,1",
+        "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+    ]
+}

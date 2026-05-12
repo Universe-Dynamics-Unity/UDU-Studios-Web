@@ -27,6 +27,8 @@ const config = {
 
 let game;
 let currentLevel = 1;
+let tieneEscudo = false; // variable para obtener si el jugador tiene el escudo o no
+window.esInvulnerable = false; // Nueva variable de protección temporal
 
 document.getElementById('btn-play').addEventListener('click', function() {
     document.getElementById('main-menu').style.display = 'none';
@@ -37,18 +39,19 @@ document.getElementById('btn-play').addEventListener('click', function() {
 
 document.getElementById('btn-reset').addEventListener('click', () => {
     // 1. Pedir confirmación doble para evitar accidentes
-    const confirmar1 = confirm("¿Estás seguro? Esto borrará TODOS tus puntos, monedas y skins compradas.");
+    const confirmar1 = confirm("¿Estás seguro? Esto borrará TODOS tus puntos, monedas, escudos y skins compradas.");
     
     if (confirmar1) {
-        const confirmar2 = confirm("¿Sin rencores? Esta acción no se puede deshacer. UDU Studios no podrá recuperar tus datos...");
+        const confirmar2 = confirm("¿Seguro al 100%? Esta acción no se puede deshacer. UDU Studios no podrá recuperar tus datos...");
         
         if (confirmar2) {
             // 2. LIMPIEZA TOTAL DEL ALMACENAMIENTO (LocalStorage)
             localStorage.removeItem('udu_nivelMax');
             localStorage.removeItem('udu_monedas');
             localStorage.removeItem('udu_puntos');
+            localStorage.removeItem('udu_escudos_inventario'); // <-- Borra los escudos comprados
             localStorage.removeItem('udu_skins');          // <-- Borra la lista de compras
-            localStorage.removeItem('udu_skin_equipada'); // <-- Quita la skin puesta y vuelve a la default
+            localStorage.removeItem('udu_skin_equipada'); // <-- Quita la skin puesta y vuelve a la default 
 
             // 3. Reiniciar las variables en el código para esta sesión
             progreso.nivelMax = 1;
@@ -74,15 +77,7 @@ let progreso = {
 };
 
 document.getElementById('btn-back-main').onclick = () => {
-    // 1. Ocultamos el selector de niveles
-    document.getElementById('level-selector').style.display = 'none';
-    
-    // 2. IMPORTANTE: Mostramos el menú con 'flex' para que respete tu CSS
-    const mainMenu = document.getElementById('main-menu');
-    mainMenu.style.display = 'block';
-    
-    // 3. Opcional: Reseteamos el scroll por si acaso
-    mainMenu.scrollTop = 0;
+    location.reload();
 };
 
 function renderizarNiveles() {
@@ -204,6 +199,8 @@ function preload() {
     this.load.image('player_down',  rutaBase + prefijo + 'down.png');
     this.load.image('player_left',  rutaBase + prefijo + 'left.png');
     this.load.image('player_right', rutaBase + prefijo + 'right.png');
+
+    this.load.image('escudo_pixelArt', 'assets/ui/escudo_pixelArt.png'); // Usa tu ruta real
 }
 
 function create() {
@@ -293,6 +290,16 @@ function create() {
     // Ahora usamos las variables que se actualizaron durante el ciclo del mapa
     this.player = this.physics.add.sprite(spawnX, spawnY, 'player_idle');
 
+    // --- AQUÍ VA LA LÓGICA DEL ESCUDO (Después de crear al player) ---
+let estadoEscudo = localStorage.getItem('udu_escudo_activo');
+if (estadoEscudo === 'true') {
+    tieneEscudo = true;
+    // CREAMOS EL AURA (Un círculo dorado semi-transparente)
+    this.aura = this.add.circle(this.player.x, this.player.y, 25, 0xffd700, 0.3);
+    this.aura.setStrokeStyle(2, 0xffd700); // Borde brillante
+    console.log("🛡️ Escudo de UDU Studios activo");
+}
+
 // 1. ESCALA GRANDE
 this.player.setScale(1); 
 
@@ -323,10 +330,39 @@ this.cameras.main.setRoundPixels(true);
     this.physics.add.collider(this.player, this.muros);
     this.physics.add.collider(this.zombies, this.muros);
 
-    this.physics.add.overlap(this.player, this.zombies, () => {
-        alert("¡Un zombie te atrapó!");
+    // CAMBIO 1: En el paréntesis pusimos 'player' en vez de 'p'
+this.physics.add.overlap(this.player, this.zombies, (player, zombie) => {
+    if (esInvulnerable) return;
+
+    if (tieneEscudo) {
+        // DETENER EL RELOJ DE 15 SEGUNDOS porque ya se usó
+        if (this.timerEscudo) this.timerEscudo.remove();
+
+        tieneEscudo = false;
+        esInvulnerable = true;
+        player.clearTint();
+        this.btnEscudo.clearTint(); // El botón vuelve a la normalidad
+        zombie.destroy();
+
+        // Efecto de parpadeo por 3 segundos
+        this.tweens.add({
+            targets: player,
+            alpha: 0.2,
+            duration: 100,
+            yoyo: true,
+            repeat: 15,
+            onComplete: () => {
+                esInvulnerable = false;
+                player.setAlpha(1);
+            }
+        });
+
+        console.log("🛡️ ¡Escudo de UDU Studios utilizado!");
+    } else {
+        alert("¡Oh, no! Un zombie te atrapó. Buen intento.")
         this.scene.restart();
-    }, null, this);
+    }
+}, null, this);
 
     this.physics.add.overlap(this.player, this.puntos, (player, punto) => { punto.destroy();
     
@@ -339,8 +375,6 @@ this.cameras.main.setRoundPixels(true);
     // 3. Actualizar los DOS textos: el de la pantalla y el del menú
     this.scoreText.setText('Puntos: ' + progreso.puntos);
     document.getElementById('total-points').innerText = progreso.puntos;
-    
-    console.log("Puntos totales guardados:", progreso.puntos);
     }, null, this);
     
     this.physics.add.overlap(this.player, this.monedas, (player, monedas) => { monedas.destroy();
@@ -475,6 +509,38 @@ this.physics.add.overlap(this.player, this.falsos, (player, sensor) => {
     this.cameras.main.flash(100, 255, 0, 0, 0.2); 
     console.log("¡Trampa convertida en muro real!");
 });
+
+// Leer cuántos escudos tenemos guardados
+    this.stockEscudos = parseInt(localStorage.getItem('udu_escudos_inventario')) || 0;
+
+   // --- FONDO DEL BOTÓN (El rectángulo negro transparente) ---
+let fondoBtn = this.add.graphics();
+fondoBtn.fillStyle(0x000000, 0.5); // Color negro, 0.5 es la transparencia (Alpha)
+// fillRoundedRect(x, y, ancho, alto, radio)
+fondoBtn.fillRoundedRect(70, 473, 75, 50, 8); 
+fondoBtn.setScrollFactor(0);
+fondoBtn.setDepth(999); // Un nivel abajo del botón y el texto
+
+// --- TU BOTÓN DEL ESCUDO ---
+this.btnEscudo = this.add.image(100, 495, 'escudo_pixelArt')
+    .setInteractive()
+    .setScale(0.8)
+    .setScrollFactor(0)
+    .setDepth(1000);
+
+// --- TU TEXTO ---
+this.txtEscudos = this.add.text(110, 500, 'x' + this.stockEscudos, { 
+    fontSize: '16px', 
+    fill: '#a600d8',
+    fontStyle: 'bold'
+})
+    .setScrollFactor(0)
+    .setDepth(1001);
+
+    // Lógica al hacer clic
+    this.btnEscudo.on('pointerdown', () => {
+        activarEscudoManual(this);
+    });
 }
     
 function update() {
@@ -496,6 +562,36 @@ function update() {
         else if (this.player.body.velocity.x > 0) this.player.setTexture('player_right');
         else if (this.player.body.velocity.y < 0) this.player.setTexture('player_up');
         else if (this.player.body.velocity.y > 0) this.player.setTexture('player_down');
+    }
+    if (this.aura) {
+        this.aura.setPosition(this.player.x, this.player.y);
+    }
+}
+
+function activarEscudoManual(escena) {
+    // 1. Verificar si tiene escudos y si NO está activo ya
+    if (escena.stockEscudos > 0 && !tieneEscudo) {
+        
+        tieneEscudo = true;
+        escena.stockEscudos -= 1;
+        localStorage.setItem('udu_escudos_inventario', escena.stockEscudos);
+        
+        // Actualizar visuales
+        escena.txtEscudos.setText('x' + escena.stockEscudos);
+        escena.btnEscudo.setTint(0x808080); // Se pone gris
+        escena.player.setTint(0x00ffff); // El aura o color azul
+        
+        console.log("🛡️ Escudo activado. Tienes 15 segundos!");
+
+        // 2. Timer de 15 segundos (Si no lo usa, lo pierde)
+        escena.timerEscudo = escena.time.delayedCall(15000, () => {
+            if (tieneEscudo) { // Si después de 15s sigue en true (no chocó con zombie)
+                tieneEscudo = false;
+                escena.player.clearTint();
+                escena.btnEscudo.clearTint(); // Vuelve a estar disponible
+                console.log("⏰ Se acabó el tiempo del escudo. ¡Lo perdiste!");
+            }
+        });
     }
 }
 
@@ -522,3 +618,76 @@ function crearPatrullero(escena, x, y) {
     zombie.body.setBounce(1, 0); // Rebota al chocar con paredes
     zombie.body.setVelocityX(150); // Empieza caminando a la derecha
 }
+
+// ==========================================
+// UDU STUDIOS - DEVELOPER COMMANDS (CONSOLE)
+// ==========================================
+window.udu = {
+    // 1. Comando para Dinero y Puntos
+    setMoney: (cantidad) => {
+        localStorage.setItem('udu_monedas', cantidad);
+        console.log(`💰 UDU Debug: Monedas ajustadas a ${cantidad}. Refresca la tienda para ver cambios.`);
+    },
+    setPuntos: (cantidad) => {
+        localStorage.setItem('udu_puntos', cantidad);
+        console.log(`⭐ UDU Debug: Puntos ajustados a ${cantidad}.`);
+    },
+
+    // 2. Comando para Escudos en Inventario
+    setShields: (cantidad) => {
+        localStorage.setItem('udu_escudos_inventario', cantidad);
+        console.log(`🛡️ UDU Debug: Ahora tienes ${cantidad} escudos en el inventario.`);
+    },
+
+    // 3. Hack de Inmortalidad Total (Para que nada te mate)
+    godMode: (activar) => {
+        esInvulnerable = activar;
+        console.log(activar ? "👼 GOD MODE: ON (Eres inmortal)" : "💀 GOD MODE: OFF (Cuidado ahí fuera)");
+    },
+
+    // 4. Desbloquear todas las skins de golpe
+    unlockAllSkins: () => {
+        const todas = ['skin_blue', 'skin_red', 'skin_purple', 'skin_multicolor1', 'protection'];
+        localStorage.setItem('udu_skins', JSON.stringify(todas));
+        console.log("🔓 UDU Debug: ¡Todas las skins desbloqueadas!");
+    },
+
+    // 5. Ayuda (Para que no se te olviden los comandos)
+    help: () => {
+        console.table([
+            { Comando: "udu.setMoney(999)", Descripcion: "Cambia tu dinero" },
+            { Comando: "udu.setShields(5)", Descripcion: "Añade escudos al inventario" },
+            { Comando: "udu.godMode(true)", Descripcion: "Nadie te hace daño" },
+            { Comando: "udu.unlockAllSkins()", Descripcion: "Desbloquea todo" }
+        ]);
+    },
+
+   modeInvincible: () => {
+        // Usamos window. para asegurar que encuentre la variable del juego
+        window.esInvulnerable = true; 
+        
+        // ¡FEEDBACK VISUAL! El personaje se pondrá amarillo/dorado
+        // Nota: Asegúrate de que 'game' y la escena existan
+        if (game && game.scene.scenes[0] && game.scene.scenes[0].player) {
+            game.scene.scenes[0].player.setTint(0xffff00); 
+        }
+
+        console.log("✅ UDU Debug: ¡MODO DIOS ACTIVADO! (Color Dorado)");
+    },
+
+    modeNormal: () => {
+        window.esInvulnerable = false;
+        
+        // Quitar el color
+        if (game && game.scene.scenes[0] && game.scene.scenes[0].player) {
+            game.scene.scenes[0].player.clearTint();
+        }
+
+        console.log("💀 UDU Debug: Modo normal. ¡Ten cuidado!");
+    },
+
+    unlockAllLevels: () => {
+        progreso.nivelMax = 15;
+        console.log("Todos los niveles han sido desbloqueados en modo historia.")
+    }
+};
