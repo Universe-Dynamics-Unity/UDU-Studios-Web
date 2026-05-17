@@ -15,7 +15,7 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false // Cambia a true si quieres ver los cuadros de colisión
+            debug: false, // Cambia a true si quieres ver los cuadros de colisión
         }
     },
     scene: {
@@ -90,8 +90,8 @@ function renderizarNiveles() {
     const coinDisplay = document.getElementById('total-points');
     if (coinDisplay) coinDisplay.innerText = progreso.puntos;
 
-    // Generamos los 15 niveles, AQUÍ GENERA MÁS
-    for (let i = 1; i <= 15; i++) {
+    // Generamos los 20 niveles, AQUÍ GENERA MÁS
+    for (let i = 1; i <= 20; i++) {
         const btn = document.createElement('button');
         btn.className = 'level-node';
         btn.innerText = i; 
@@ -152,7 +152,7 @@ function iniciarJuego(numNivel) {
 
 function preload() {
     // 1. CARGA DE MAPAS (Esto se queda igual)
-    for (let i = 1; i <= 15; i++) {
+    for (let i = 1; i <= 20; i++) {
         let ruta = `niveles/nivel${i}/mapa${i === 1 ? '' : i}.json`;
         this.load.json(`mapaNivel${i}`, ruta);
     }
@@ -163,6 +163,8 @@ function preload() {
     this.load.image('zombie_down', 'assets/sprites/enemy-sprites/zombie_down.png');
     this.load.image('zombie_left', 'assets/sprites/enemy-sprites/zombie_left.png');
     this.load.image('zombie_right', 'assets/sprites/enemy-sprites/zombie_right.png');
+
+    this.load.image('zombie_stalker', 'assets/sprites/enemy-sprites/zombie_idle.png');
 
     // 3. LÓGICA DE SKINS PARA EL JUGADOR
     const skinEquipada = localStorage.getItem('udu_skin_equipada') || 'default';
@@ -201,6 +203,7 @@ function preload() {
     this.load.image('player_right', rutaBase + prefijo + 'right.png');
 
     this.load.image('escudo_pixelArt', 'assets/ui/escudo_pixelArt.png'); // Usa tu ruta real
+    this.load.image('portal_void', 'assets/items/portal.png') // Ruta a la imagen del portal
 }
 
 function create() {
@@ -223,6 +226,8 @@ function create() {
     this.puntos = this.physics.add.group();
     this.zombies = this.physics.add.group();
     this.falsos = this.physics.add.group()
+    this.zombiesSeguidores = this.physics.add.group();
+    this.physics.add.collider(this.zombiesSeguidores, this.muros);
     this.score = 0; // Inicializamos el puntaje
 
     let spawnX = 36; 
@@ -248,35 +253,49 @@ function create() {
                 let moneda = this.add.circle(posX, posY, 6, 0xffb300);
                 this.monedas.add(moneda);
             } else if (valor === 'P') {
-            // ¡Aquí está el truco! 
-            // Guardamos la posición donde pusiste la P en el JSON
-            spawnX = posX;
-            spawnY = posY;
-            // No creamos ningún objeto físico aquí para que actúe como "o" (espacio vacío)
+                // ¡Aquí está el truco! 
+                // Guardamos la posición donde pusiste la P en el JSON
+                spawnX = posX;
+                spawnY = posY;
+                // No creamos ningún objeto físico aquí para que actúe como "o" (espacio vacío)
+            } else if (valor === "W") {
+    // 1. Creamos el sprite en su posición real (posX, posY)
+    let stalker = this.zombiesSeguidores.create(posX, posY, 'zombie_stalker');
+    
+    // 2. Le damos física
+    stalker.setCollideWorldBounds(true);
+    
+    // 3. LE CONECTAMOS EL CEREBRO (Pasándole el jugador)
+    stalker.brain = new StalkerBrain(this, stalker, this.player);
+    
+    console.log("🧟 UDU AI: Stalker activado!");
+    stalker.setBounce(0.1); // Para que no se quede pegado a la pared
+    this.physics.add.collider(stalker, this.muros); // ¡Importante que choque con los muros!
             } else if (valor === 'f') {
-                // 1. Usamos una imagen que YA exista para evitar el cuadro verde (muro)
-    // 2. Le bajamos el alpha a 0 para que sea invisible
-    let sensor = this.falsos.create(posX, posY, 'muro').setAlpha(0);
+                let sensor = this.falsos.create(posX, posY, 'zombie_idle').setAlpha(0);
+                sensor.setData('x', posX); // Guardamos la X
+                sensor.setData('y', posY); // Guardamos la Y
+                sensor.body.setSize(4, 4);
+                sensor.body.setOffset(10, 10);
+            } else if (valor === "S") {
+                // Creamos el portal usando tu imagen
+                let portal = this.portales.create(posX, posY, 'portal_void');
     
-    // 3. ¡EL TRUCO! Hacemos el sensor minúsculo (4x4 píxeles) 
-    // y lo centramos para que no se active por error
-    sensor.body.setSize(4, 4);
-    sensor.body.setOffset(10, 10);
-                } else if (valor === "S") {
-                let portal = this.add.rectangle(posX, posY, tileSize, tileSize, 0x00ffff);
-                this.portales.add(portal); 
+                // Lo ajustamos al tamaño del bloque (24x24)
+                portal.setDisplaySize(tileSize, tileSize); 
     
-            // Animación de brillo (opcional pero se ve genial)
-            this.tweens.add({
-                targets: portal,
-                alpha: 0.5,
-                duration: 1000,
-                yoyo: true,
-                repeat: -1
-            });
-          };
+                // Le damos el toque de UDU Studios: un brillo neón
+                this.tweens.add({
+                    targets: portal,
+                    alpha: 0.7,
+                    scale: 1.2,
+                    duration: 800,
+                    yoyo: true,
+                    repeat: -1
+                });
+            };
         });
-     });
+    });
 
     // Calculamos el ancho y alto real del mapa basado en tu array
     const mapaAncho = datosNivel.mapa[0].split(',').length * tileSize;
@@ -359,8 +378,48 @@ this.physics.add.overlap(this.player, this.zombies, (player, zombie) => {
 
         console.log("🛡️ ¡Escudo de UDU Studios utilizado!");
     } else {
-        alert("¡Oh, no! Un zombie te atrapó. Buen intento.")
-        this.scene.restart();
+        this.physics.pause(); // Pausamos la física del juego
+        this.player.setTint(0xff0000); // Ponemos al jugador rojo de que perdió
+
+        // Mostramos la ventanita usando su ID de HTML
+        document.getElementById('pantalla-muerte').style.display = 'flex';
+    }
+}, null, this);
+
+    this.physics.add.overlap(this.player, this.zombiesSeguidores, (player, stalker) => {
+    // Si eres invulnerable (God Mode), no te hace nada
+    if (window.esInvulnerable) return;
+
+    if (tieneEscudo) {
+        // DETENER EL RELOJ DE 15 SEGUNDOS porque ya se usó
+        if (this.timerEscudo) this.timerEscudo.remove();
+
+        tieneEscudo = false;
+        esInvulnerable = true;
+        player.clearTint();
+        this.btnEscudo.clearTint(); // El botón vuelve a la normalidad
+        stalker.destroy();
+
+        // Efecto de parpadeo por 3 segundos
+        this.tweens.add({
+            targets: player,
+            alpha: 0.2,
+            duration: 100,
+            yoyo: true,
+            repeat: 15,
+            onComplete: () => {
+                esInvulnerable = false;
+                player.setAlpha(1);
+            }
+        });
+
+        console.log("🛡️ ¡Escudo de UDU Studios utilizado!");
+    } else {
+        this.physics.pause(); // Pausamos la física del juego
+        this.player.setTint(0xff0000); // Ponemos al jugador rojo de que perdió
+
+        // Mostramos la ventanita usando su ID de HTML
+        document.getElementById('pantalla-muerte').style.display = 'flex';
     }
 }, null, this);
 
@@ -387,8 +446,6 @@ this.physics.add.overlap(this.player, this.zombies, (player, zombie) => {
     
     // 3. Actualizar los DOS textos: el de la pantalla y el del menú
     this.textoMonedas.setText('Monedas: ' + progreso.monedas);
-    
-    console.log("Monedas totales recogidas:", progreso.monedas);
     }, null, this);
 
     this.physics.add.overlap(this.player, this.portales, () => {
@@ -485,29 +542,22 @@ this.physics.add.overlap(this.player, this.zombies, (player, zombie) => {
             renderizarNiveles();
         }
     });
-    // --- LÓGICA DE TRAMPA DEFINITIVA (SIN CUADROS VERDES) ---
+    // --- LÓGICA DE TRAMPA DEFINITIVA ---
 this.physics.add.overlap(this.player, this.falsos, (player, sensor) => {
-    // 1. Le ponemos la imagen del muro de verdad
-    this.add.rectangle(posX, posY, tileSize, tileSize, 0x4a0080);
-    this.muros.add(muro);
+    let realX = sensor.getData('x');
+    let realY = sensor.getData('y');
     
-    // 2. Lo hacemos visible (quitamos la transparencia)
+    // 1. Creamos el rectángulo visual
+    let muroTrampa = this.add.rectangle(realX, realY, 24, 24, 0x4a0080);
+    
+    // 2. Lo hacemos visible y sólido
     sensor.setAlpha(1);
-
-    // 3. ¡EL PASO CLAVE! Lo volvemos sólido
-    // Sacamos al sensor del grupo de "falsos" y lo metemos a "muros"
     this.falsos.remove(sensor);
-    this.muros.add(sensor);
+    this.muros.add(muroTrampa); // Añadimos el nuevo rectángulo a los muros
 
-    // 4. Actualizamos el cuerpo físico para que bloquee al jugador
-    // Esto hace que el cuadro de debug morado se vuelva verde (sólido)
-    sensor.body.setImmovable(true);
-    sensor.body.setSize(24, 24); // Recupera su tamaño real de pared
-    sensor.body.setOffset(0, 0);
-
-    // 5. El efecto de UDU Studios
+    // 3. El efecto de sacudida/flash de UDU Studios
     this.cameras.main.flash(100, 255, 0, 0, 0.2); 
-    console.log("¡Trampa convertida en muro real!");
+    console.log("¡Trampa de The Void activada!");
 });
 
 // Leer cuántos escudos tenemos guardados
@@ -566,6 +616,21 @@ function update() {
     if (this.aura) {
         this.aura.setPosition(this.player.x, this.player.y);
     }
+    // --- DENTRO DEL UPDATE DE game.js ---
+if (this.zombiesSeguidores) {
+    this.zombiesSeguidores.getChildren().forEach(stalker => {
+        // VERIFICACIÓN TRIPLE: ¿Existe el stalker? ¿Tiene cerebro? ¿Está vivo?
+        if (stalker && stalker.active && stalker.brain) {
+            try {
+                stalker.brain.update();
+            } catch (e) {
+                // Si falla, solo avisa una vez y desactiva el cerebro para no laguear
+                console.error("Error en el cerebro del zombie:", e);
+                stalker.brain = null; 
+            }
+        }
+    });
+}
 }
 
 function activarEscudoManual(escena) {
@@ -619,75 +684,22 @@ function crearPatrullero(escena, x, y) {
     zombie.body.setVelocityX(150); // Empieza caminando a la derecha
 }
 
-// ==========================================
-// UDU STUDIOS - DEVELOPER COMMANDS (CONSOLE)
-// ==========================================
-window.udu = {
-    // 1. Comando para Dinero y Puntos
-    setMoney: (cantidad) => {
-        localStorage.setItem('udu_monedas', cantidad);
-        console.log(`💰 UDU Debug: Monedas ajustadas a ${cantidad}. Refresca la tienda para ver cambios.`);
-    },
-    setPuntos: (cantidad) => {
-        localStorage.setItem('udu_puntos', cantidad);
-        console.log(`⭐ UDU Debug: Puntos ajustados a ${cantidad}.`);
-    },
+// --- ACTUALIZACIÓN DE REINICIO SIN RELOAD ---
+function reiniciarJuego() {
+    // 1. Ocultamos la ventana de muerte
+    document.getElementById('pantalla-muerte').style.display = 'none';
+    
+    // 2. Ocultamos el contenedor del lienzo de Phaser
+    const contenedorJuego = document.getElementById('game-container');
+    if (contenedorJuego) contenedorJuego.style.display = 'none';
 
-    // 2. Comando para Escudos en Inventario
-    setShields: (cantidad) => {
-        localStorage.setItem('udu_escudos_inventario', cantidad);
-        console.log(`🛡️ UDU Debug: Ahora tienes ${cantidad} escudos en el inventario.`);
-    },
-
-    // 3. Hack de Inmortalidad Total (Para que nada te mate)
-    godMode: (activar) => {
-        esInvulnerable = activar;
-        console.log(activar ? "👼 GOD MODE: ON (Eres inmortal)" : "💀 GOD MODE: OFF (Cuidado ahí fuera)");
-    },
-
-    // 4. Desbloquear todas las skins de golpe
-    unlockAllSkins: () => {
-        const todas = ['skin_blue', 'skin_red', 'skin_purple', 'skin_multicolor1', 'protection'];
-        localStorage.setItem('udu_skins', JSON.stringify(todas));
-        console.log("🔓 UDU Debug: ¡Todas las skins desbloqueadas!");
-    },
-
-    // 5. Ayuda (Para que no se te olviden los comandos)
-    help: () => {
-        console.table([
-            { Comando: "udu.setMoney(999)", Descripcion: "Cambia tu dinero" },
-            { Comando: "udu.setShields(5)", Descripcion: "Añade escudos al inventario" },
-            { Comando: "udu.godMode(true)", Descripcion: "Nadie te hace daño" },
-            { Comando: "udu.unlockAllSkins()", Descripcion: "Desbloquea todo" }
-        ]);
-    },
-
-   modeInvincible: () => {
-        // Usamos window. para asegurar que encuentre la variable del juego
-        window.esInvulnerable = true; 
-        
-        // ¡FEEDBACK VISUAL! El personaje se pondrá amarillo/dorado
-        // Nota: Asegúrate de que 'game' y la escena existan
-        if (game && game.scene.scenes[0] && game.scene.scenes[0].player) {
-            game.scene.scenes[0].player.setTint(0xffff00); 
-        }
-
-        console.log("✅ UDU Debug: ¡MODO DIOS ACTIVADO! (Color Dorado)");
-    },
-
-    modeNormal: () => {
-        window.esInvulnerable = false;
-        
-        // Quitar el color
-        if (game && game.scene.scenes[0] && game.scene.scenes[0].player) {
-            game.scene.scenes[0].player.clearTint();
-        }
-
-        console.log("💀 UDU Debug: Modo normal. ¡Ten cuidado!");
-    },
-
-    unlockAllLevels: () => {
-        progreso.nivelMax = 15;
-        console.log("Todos los niveles han sido desbloqueados en modo historia.")
+    // 3. Destruimos la instancia de Phaser por completo (libera RAM y Canvas)
+    if (game) {
+        game.destroy(true);
+        game = null; // Reiniciamos la variable global
     }
-};
+    
+    // 4. Mostramos el menú selector de niveles de forma nativa e inmediata
+    document.getElementById('level-selector').style.display = 'flex';
+    renderizarNiveles(); 
+}

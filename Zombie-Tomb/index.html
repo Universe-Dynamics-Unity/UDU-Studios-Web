@@ -21,8 +21,8 @@
                 <button id="btn-reset" class="menu-button" style="background-color: #ff4d4d; color: white;">BORRAR PROGRESO</button>
                 <button id="btn-credits" class="menu-button" onclick="abrirCreditos()">CRÉDITOS</button>
                 
-                <p class="notes-next-update"><span class="p-purple">Notas de la próxima update 1.5</span>:<br>
-                    Se implementará algo sorpresa y agregaremos más niveles<br> próximamente. Esperamos que te haya gustado la <span class="p-purple">versión 1.4</span></7> :D</p>
+                <p class="notes-next-update"><span class="p-purple">Notas de la próxima update 1.6.</span><br><span class="p-purple2">"Soporte técnico Parte 1":</span><br>
+                    <span class="p-purple">(Mega Update):</span> Se agregarán muchas cosas importantes e interesantes en esta Mega Update 1.6 próximamente.<br> Esperamos que te haya gustado la <span class="p-purple">versión 1.5</span></7> :D</p>
             </div>
             
             <img src="assets/ui/logo_UDU_Studios-pixelart.png" alt="UDU Studios" class="brand-logo">
@@ -66,25 +66,32 @@
 
             <p style="color: var(--neon-pink);" class="frase-xd">La inflación, hermano.</p>
 
-        <footer>
             <button id="btn-back2" onclick="volverAlMenu()">VOLVER AL MENÚ</button>
-        </footer>
     </div>
 
     <div class="creditos" style="text-align: center;" id="creditos">
         <button class="close-btn" onclick="cerrarCreditos()">&times;</button>
         <h2 class="creditos-h2">Créditos</h2>
         <p class="creditos-p">¡Esperamos que te haya gustado el juego!</p>
-        <p class="creditos-pMorado">Zombie Tomb - version 1.4</p>
+        <p class="creditos-pMorado">Zombie Tomb - version 1.5</p>
         <p class="creditos-p">&copy; 2026 <strong>UDU Studios</strong>. Todos los derechos reservados.<br>
         Desarrollado por <strong><span class="U">U</span><span class="D">D</span><span class="U2">U</span> <span class="Studios">Studios</span></strong> & <strong><strong><span class="AlanRS">Alan R.S</span></strong></p>
     </div>
 
     <div class="version-game">
-        <p>Zombie Tomb <span class="p-purple">versión 1.4</span></p>
+        <p>Zombie Tomb <span class="p-purple">versión 1.5</span></p>
     </div>
 
-    <script type="module" src="game.js"></script>
+    <div id="pantalla-muerte" class="overlay-muerte">
+    <div class="ventana-muerte">
+        <h2>HAS MUERTO</h2>
+        <p id="txtDeath">Los zombies te alcanzaron en los pasillos...</p>
+        <button id="btn-reiniciar" onclick="reiniciarJuego()">INTENTAR DE NUEVO</button>
+    </div>
+</div>
+
+    <script src="zombieAI.js"></script>
+    <script src="game.js"></script>
     <script src="tienda/shop.js"></script>
     <script>
         function abrirTienda() {
