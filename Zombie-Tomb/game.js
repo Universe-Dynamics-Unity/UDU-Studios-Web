@@ -28,7 +28,12 @@ const config = {
 let game;
 let currentLevel = 1;
 let tieneEscudo = false; // variable para obtener si el jugador tiene el escudo o no
-window.esInvulnerable = false; // Nueva variable de protección temporal
+window.esInvulnerable = false;
+window.nivelCorrupto = false;
+window.zombiesCongelados = false;
+window.velocidadActiva = false;
+let ultimaCeldaX = -1;         // NUEVA: Para saber dónde pisó el jugador antes
+let ultimaCeldaY = -1;         // NUEVA: Para no ponerle la lava encima y matarlo al instante
 
 document.getElementById('btn-play').addEventListener('click', function() {
     document.getElementById('main-menu').style.display = 'none';
@@ -39,10 +44,10 @@ document.getElementById('btn-play').addEventListener('click', function() {
 
 document.getElementById('btn-reset').addEventListener('click', () => {
     // 1. Pedir confirmación doble para evitar accidentes
-    const confirmar1 = confirm("¿Estás seguro? Esto borrará TODOS tus puntos, monedas, escudos y skins compradas.");
+    const confirmar1 = confirm("¿Estás seguro? Esto borrará TODOS tus puntos, monedas, skins y boosters comprados,");
     
     if (confirmar1) {
-        const confirmar2 = confirm("¿Seguro al 100%? Esta acción no se puede deshacer. UDU Studios no podrá recuperar tus datos...");
+        const confirmar2 = confirm("¿Seguro al 100%? Esta acción no se puede deshacer. No se podrán recuperar tus datos...");
         
         if (confirmar2) {
             // 2. LIMPIEZA TOTAL DEL ALMACENAMIENTO (LocalStorage)
@@ -50,6 +55,8 @@ document.getElementById('btn-reset').addEventListener('click', () => {
             localStorage.removeItem('udu_monedas');
             localStorage.removeItem('udu_puntos');
             localStorage.removeItem('udu_escudos_inventario'); // <-- Borra los escudos comprados
+            localStorage.removeItem('udu_congelamientos_inventario'); // <-- Borra todos los boosters de congelamiento comprados
+            localStorage.removeItem('udu_velocidad_inventario'); // <-- Borra todos los boosters de velocidad comprados
             localStorage.removeItem('udu_skins');          // <-- Borra la lista de compras
             localStorage.removeItem('udu_skin_equipada'); // <-- Quita la skin puesta y vuelve a la default 
 
@@ -90,7 +97,7 @@ function renderizarNiveles() {
     const coinDisplay = document.getElementById('total-points');
     if (coinDisplay) coinDisplay.innerText = progreso.puntos;
 
-    // Generamos los 20 niveles, AQUÍ GENERA MÁS
+    // Generamos los 25 niveles, AQUÍ GENERA MÁS
     for (let i = 1; i <= 20; i++) {
         const btn = document.createElement('button');
         btn.className = 'level-node';
@@ -188,7 +195,13 @@ function preload() {
         rutaBase = 'assets/sprites/player-sprites/skins_player/skin_multicolor1/';
         prefijo = 'player_';
     } 
-    else {
+    else if (skinEquipada === 'skin_void') {
+        rutaBase = 'assets/sprites/player-sprites/skins_player/skin_void/';
+        prefijo = 'player_';
+    } else if (skinEquipada === 'skin_udu') {
+        rutaBase = 'assets/sprites/player-sprites/skins_player/skin_udu/';
+        prefijo = 'player_';
+    } else {
         // Skin original (Default)
         rutaBase = 'assets/sprites/player-sprites/';
         prefijo = 'player_';
@@ -202,7 +215,12 @@ function preload() {
     this.load.image('player_left',  rutaBase + prefijo + 'left.png');
     this.load.image('player_right', rutaBase + prefijo + 'right.png');
 
-    this.load.image('escudo_pixelArt', 'assets/ui/escudo_pixelArt.png'); // Usa tu ruta real
+    this.load.image('escudo_pixelArt', 'assets/ui/escudo_pixelArt.png');
+    this.load.image('btn_congelar', 'assets/ui/congelamiento_pixelArt.png');
+    this.load.image('btn_velocidad', 'assets/ui/velocidad_pixelArt.png');
+    this.load.image('textura_pared', 'assets/items/wall.png');
+    this.load.image('textura_punto', 'assets/items/point.png');
+    this.load.image('textura_moneda', 'assets/items/money.png');
     this.load.image('portal_void', 'assets/items/portal.png') // Ruta a la imagen del portal
 }
 
@@ -225,10 +243,15 @@ function create() {
     this.monedas = this.physics.add.group();
     this.puntos = this.physics.add.group();
     this.zombies = this.physics.add.group();
+    this.lavas = this.physics.add.staticGroup();
     this.falsos = this.physics.add.group()
     this.zombiesSeguidores = this.physics.add.group();
     this.physics.add.collider(this.zombiesSeguidores, this.muros);
     this.score = 0; // Inicializamos el puntaje
+
+    // ¡AQUÍ! Forzamos a que en cada reinicio empiecen de cero y sin fantasmas:
+    this.triggers = this.physics.add.staticGroup(); 
+    this.contadorTriggers = 0;
 
     let spawnX = 36; 
     let spawnY = 36;
@@ -241,36 +264,51 @@ function create() {
             let posY = y * tileSize + tileSize/2;
 
             if (valor === "1") {
-                let muro = this.add.rectangle(posX, posY, tileSize, tileSize, 0x4a0080);
-                this.muros.add(muro);
+                // Regresamos al bloque morado clásico de UDU Studios
+                let pared = this.add.rectangle(posX, posY, tileSize, tileSize, 0x4a0080);
+                this.physics.add.existing(pared, true); // El "true" lo hace estático (muro duro)
+                this.muros.add(pared);
             } else if (valor === "0") {
-                let punto = this.add.circle(posX, posY, 4, 0xffff00);
-                this.puntos.add(punto);
+                // En vez de un círculo dibujado, creamos un sprite con física usando la textura
+                let punto = this.puntos.create(posX, posY, 'textura_punto');
+                // Hacemos que la imagen mida 8x8 píxeles (equivalente a tu radio de 4)
+                punto.setDisplaySize(14, 14);
             } else if (valor === "o") {
             } else if (valor === "Z") {
                 crearPatrullero(this, posX, posY, 100); 
             } else if (valor === "m") {
-                let moneda = this.add.circle(posX, posY, 6, 0xffb300);
-                this.monedas.add(moneda);
+                // Creamos el sprite de la moneda de The Void (la "Z")
+                let moneda = this.monedas.create(posX, posY, 'textura_moneda');
+                // Hacemos que mida 12x12 píxeles (equivalente a tu radio de 6)
+                moneda.setDisplaySize(22, 22);
             } else if (valor === 'P') {
                 // ¡Aquí está el truco! 
                 // Guardamos la posición donde pusiste la P en el JSON
                 spawnX = posX;
                 spawnY = posY;
                 // No creamos ningún objeto físico aquí para que actúe como "o" (espacio vacío)
+            } else if (valor === "T") {
+                let trigger = this.add.zone(posX, posY, tileSize, tileSize);
+                this.physics.add.existing(trigger, true); // Invisibles y estáticos
+                
+                // Asignamos su ID por orden de aparición
+                trigger.setData('id', this.contadorTriggers);
+                this.triggers.add(trigger);
+                
+                this.contadorTriggers++;
             } else if (valor === "W") {
-    // 1. Creamos el sprite en su posición real (posX, posY)
-    let stalker = this.zombiesSeguidores.create(posX, posY, 'zombie_stalker');
+                // 1. Creamos el sprite en su posición real (posX, posY)
+                let stalker = this.zombiesSeguidores.create(posX, posY, 'zombie_stalker');
     
-    // 2. Le damos física
-    stalker.setCollideWorldBounds(true);
+                // 2. Le damos física
+                stalker.setCollideWorldBounds(true);
     
-    // 3. LE CONECTAMOS EL CEREBRO (Pasándole el jugador)
-    stalker.brain = new StalkerBrain(this, stalker, this.player);
+                // 3. LE CONECTAMOS EL CEREBRO (Pasándole el jugador)
+                stalker.brain = new StalkerBrain(this, stalker, this.player);
     
-    console.log("🧟 UDU AI: Stalker activado!");
-    stalker.setBounce(0.1); // Para que no se quede pegado a la pared
-    this.physics.add.collider(stalker, this.muros); // ¡Importante que choque con los muros!
+                console.log("🧟 UDU AI: Stalker activado!");
+                stalker.setBounce(0.1); // Para que no se quede pegado a la pared
+                this.physics.add.collider(stalker, this.muros); // ¡Importante que choque con los muros!
             } else if (valor === 'f') {
                 let sensor = this.falsos.create(posX, posY, 'zombie_idle').setAlpha(0);
                 sensor.setData('x', posX); // Guardamos la X
@@ -345,13 +383,67 @@ this.cameras.main.setZoom(miZoom);
 this.player.setCollideWorldBounds(true);
 this.cameras.main.setRoundPixels(true);
 
+const listaMensajes = datosNivel.mensajes || [];
+    
+    if (this.triggers) {
+        this.physics.add.overlap(this.player, this.triggers, (player, trigger) => {
+            let idTrigger = trigger.getData('id');
+            // Busca el mensaje correspondiente, y si no hay varios, agarra el primero por defecto
+            let datosMensaje = listaMensajes[idTrigger] || (listaMensajes[0] ? listaMensajes[0] : null);
+            
+            if (datosMensaje && datosMensaje.text) {
+                mostrarTitle(this, datosMensaje.text);
+            }
+            
+            // Destruimos este trigger para que no se repita el mensaje si vuelves a pisarlo
+            trigger.destroy(); 
+        }, null, this);
+    }
+
     // --- 4. COLISIONES DEL JUGADOR ---
     this.physics.add.collider(this.player, this.muros);
-    this.physics.add.collider(this.zombies, this.muros);
+    this.physics.add.collider(this.zombies, this.muros, (zombie, muro) => {
+        if (window.zombiesCongelados) return; // <-- AÑADE ESTO: Si están congelados, no calculan rebotes
+        // Si el zombie ya está detenido esperando, no hacemos nada
+        if (zombie.getData('pausado')) return;
+
+        // Lo marcamos como pausado para que no se ejecute varias veces
+        zombie.setData('pausado', true);
+
+        // Averiguamos de qué lado chocó para saber hacia dónde debe caminar después
+        let nuevaVelocidad = 150;
+        if (zombie.body.blocked.right) {
+            nuevaVelocidad = -150; // Chocó a la derecha, irá a la izquierda
+        } else if (zombie.body.blocked.left) {
+            nuevaVelocidad = 150;  // Chocó a la izquierda, irá a la derecha
+        }
+
+        // 1. Lo detenemos por completo
+        zombie.body.setVelocityX(0);
+
+        // 2. Iniciamos el temporizador de 1 segundo (1000 milisegundos)
+        this.time.delayedCall(500, () => {
+            // Verificamos que el zombie siga vivo (por si el jugador lo eliminó con el escudo en ese segundo)
+            if (zombie && zombie.active) {
+                zombie.body.setVelocityX(nuevaVelocidad);
+                zombie.setData('pausado', false);
+            }
+        });
+    }, null, this);
 
     // CAMBIO 1: En el paréntesis pusimos 'player' en vez de 'p'
 this.physics.add.overlap(this.player, this.zombies, (player, zombie) => {
     if (esInvulnerable) return;
+
+    // --- NUEVA LÓGICA DE CONGELAMIENTO ---
+        if (window.zombiesCongelados) {
+            zombie.destroy(); // Lo rompes como hielo
+            console.log("❄️ ¡Zombi de hielo destruido!");
+            
+            // Un mini flash blanco rápido para que se sienta el "golpe" de romperlo
+            this.cameras.main.flash(50, 255, 255, 255, 0.2); 
+            return; // Detenemos la función aquí para que NO te quite el escudo ni te mate
+        }
 
     if (tieneEscudo) {
         // DETENER EL RELOJ DE 15 SEGUNDOS porque ya se usó
@@ -388,7 +480,16 @@ this.physics.add.overlap(this.player, this.zombies, (player, zombie) => {
 
     this.physics.add.overlap(this.player, this.zombiesSeguidores, (player, stalker) => {
     // Si eres invulnerable (God Mode), no te hace nada
-    if (window.esInvulnerable) return;
+    if (esInvulnerable) return;
+
+    // --- NUEVA LÓGICA DE CONGELAMIENTO ---
+        if (window.zombiesCongelados) {
+            stalker.destroy(); // Rompes al Stalker
+            console.log("❄️ ¡Stalker de hielo destruido!");
+            
+            this.cameras.main.flash(50, 255, 255, 255, 0.2); 
+            return; // Salimos para que no te mate
+        }
 
     if (tieneEscudo) {
         // DETENER EL RELOJ DE 15 SEGUNDOS porque ya se usó
@@ -448,6 +549,49 @@ this.physics.add.overlap(this.player, this.zombies, (player, zombie) => {
     this.textoMonedas.setText('Monedas: ' + progreso.monedas);
     }, null, this);
 
+    // Reseteamos las variables de corrupción al iniciar cualquier nivel
+    window.nivelCorrupto = false;
+    ultimaCeldaX = -1;
+    ultimaCeldaY = -1;
+
+    // --- INYECTOR DINÁMICO DE NIVELES (El sistema call.js) ---
+    // Esto inyecta un <script> en tu HTML temporalmente para leer la lógica del nivel
+    let scriptViejo = document.getElementById('script-corrupcion');
+    if (scriptViejo) scriptViejo.remove();
+
+    let scriptPlugin = document.createElement('script');
+    scriptPlugin.id = 'script-corrupcion';
+    scriptPlugin.src = `niveles/nivel${currentLevel}/call.js`;
+    document.head.appendChild(scriptPlugin);
+    // Si el archivo call.js existe en esa carpeta, se ejecutará. Si no existe, dará un error 
+    // silencioso en consola pero el juego seguirá normal sin corrupción.
+
+    // --- COLISIÓN DE LAVA ---
+    this.physics.add.overlap(this.player, this.lavas, (player, lava) => {
+        if (esInvulnerable) return; // God Mode te salva
+        if (tieneEscudo) {
+            // El escudo de UDU Studios absorbe el golpe de la lava
+            if (this.timerEscudo) this.timerEscudo.remove();
+            tieneEscudo = false;
+            esInvulnerable = true;
+            player.clearTint();
+            this.btnEscudo.clearTint();
+            lava.destroy(); // Enfrías la lava al tocarla con escudo
+            
+            this.tweens.add({ targets: player, alpha: 0.2, duration: 100, yoyo: true, repeat: 15, 
+                onComplete: () => { esInvulnerable = false; player.setAlpha(1); } 
+            });
+        } else {
+            // MUERTE POR CORRUPCIÓN
+            this.physics.pause();
+            this.player.setTint(0xff4500); // Se pone color naranja quemado
+            
+            // Cambiamos el texto dinámicamente según la idea del CEO
+            document.getElementById('txtDeath').innerText = "Has caído en la lava...";
+            document.getElementById('pantalla-muerte').style.display = 'flex';
+        }
+    }, null, this);
+
     this.physics.add.overlap(this.player, this.portales, () => {
     // 1. Si pasamos el nivel más alto que teníamos, desbloqueamos el siguiente
     if (currentLevel === parseInt(progreso.nivelMax)) {
@@ -466,25 +610,28 @@ this.physics.add.overlap(this.player, this.zombies, (player, zombie) => {
 
     // Detectar deslizamiento en pantalla táctil
     this.input.on('pointerup', (pointer) => {
-    const swipeThreshold = 50; // Distancia mínima para detectar el deslizamiento
-    const distX = pointer.upX - pointer.downX;
-    const distY = pointer.upY - pointer.downY;
+        const swipeThreshold = 50; 
+        const distX = pointer.upX - pointer.downX;
+        const distY = pointer.upY - pointer.downY;
 
-    // Solo se mueve si el personaje está quieto
-    if (this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0) {
-        if (Math.abs(distX) > Math.abs(distY)) {
-            if (Math.abs(distX) > swipeThreshold) {
-                if (distX > 0) this.player.body.setVelocityX(400); // Derecha
-                else this.player.body.setVelocityX(-400); // Izquierda
-            }
-        } else {
-            if (Math.abs(distY) > swipeThreshold) {
-                if (distY > 0) this.player.body.setVelocityY(400); // Abajo
-                else this.player.body.setVelocityY(-400); // Arriba
+        // VELOCIDAD DINÁMICA: Si el booster está activo usa 800, si no usa 400
+        let velSwipe = window.velocidadActiva ? 800 : 500;
+
+        if (this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0) {
+            if (Math.abs(distX) > Math.abs(distY)) {
+                if (Math.abs(distX) > swipeThreshold) {
+                    if (distX > 0) this.player.body.setVelocityX(velSwipe); // Derecha
+                    else this.player.body.setVelocityX(-velSwipe); // Izquierda
+                }
+            } else {
+                if (Math.abs(distY) > swipeThreshold) {
+                    if (distY > 0) this.player.body.setVelocityY(velSwipe); // Abajo
+                    else this.player.body.setVelocityY(-velSwipe); // Arriba
+                }
             }
         }
-    }
-});
+    });
+
     this.cursors = this.input.keyboard.createCursorKeys();
 
     // Texto para el puntaje en la esquina (x: 10, y: 10)
@@ -563,34 +710,71 @@ this.physics.add.overlap(this.player, this.falsos, (player, sensor) => {
 // Leer cuántos escudos tenemos guardados
     this.stockEscudos = parseInt(localStorage.getItem('udu_escudos_inventario')) || 0;
 
-   // --- FONDO DEL BOTÓN (El rectángulo negro transparente) ---
-let fondoBtn = this.add.graphics();
-fondoBtn.fillStyle(0x000000, 0.5); // Color negro, 0.5 es la transparencia (Alpha)
-// fillRoundedRect(x, y, ancho, alto, radio)
-fondoBtn.fillRoundedRect(70, 473, 75, 50, 8); 
-fondoBtn.setScrollFactor(0);
-fondoBtn.setDepth(999); // Un nivel abajo del botón y el texto
+  // ==========================================
+    // UI DE BOOSTERS (BOTONES INFERIORES)
+    // ==========================================
+    
+    // 1. FONDO DE LOS BOTONES
+    let fondoBtn = this.add.graphics();
+    fondoBtn.fillStyle(0x000000, 0.5); 
+    fondoBtn.setScrollFactor(0);
+    fondoBtn.setDepth(999);
 
-// --- TU BOTÓN DEL ESCUDO ---
-this.btnEscudo = this.add.image(100, 495, 'escudo_pixelArt')
-    .setInteractive()
-    .setScale(0.8)
-    .setScrollFactor(0)
-    .setDepth(1000);
+    // --- ESCUDO ---
+    fondoBtn.fillRoundedRect(70, 480, 60, 40, 8); // Más pequeño: 60x40
 
-// --- TU TEXTO ---
-this.txtEscudos = this.add.text(110, 500, 'x' + this.stockEscudos, { 
-    fontSize: '16px', 
-    fill: '#a600d8',
-    fontStyle: 'bold'
-})
-    .setScrollFactor(0)
-    .setDepth(1001);
+    this.btnEscudo = this.add.image(85, 500, 'escudo_pixelArt')
+        .setInteractive()
+        .setScale(0.5) // <-- MÁS CHICO
+        .setScrollFactor(0)
+        .setDepth(1000);
 
-    // Lógica al hacer clic
-    this.btnEscudo.on('pointerdown', () => {
-        activarEscudoManual(this);
-    });
+    this.txtEscudos = this.add.text(100, 493, 'x' + this.stockEscudos, { 
+        fontSize: '14px', // <-- LETRA MÁS CHICA
+        fill: '#a600d8',
+        fontStyle: 'bold'
+    }).setScrollFactor(0).setDepth(1001);
+
+    this.btnEscudo.on('pointerdown', () => { activarEscudoManual(this); });
+
+    // --- CONGELAMIENTO ---
+    fondoBtn.fillRoundedRect(150, 480, 60, 40, 8); // Centrado en la pantalla
+
+    this.stockCongelamiento = parseInt(localStorage.getItem('udu_congelamientos_inventario')) || 0;
+
+    fondoBtn.fillRoundedRect(150, 480, 60, 40, 8); // Centrado en la pantalla
+
+    this.btnCongelar = this.add.image(165, 500, 'btn_congelar')
+        .setInteractive()
+        .setScale(0.5) 
+        .setScrollFactor(0)
+        .setDepth(1000);
+
+    this.txtCongelar = this.add.text(180, 493, 'x' + this.stockCongelamiento, { 
+        fontSize: '14px', 
+        fill: '#00ffff', 
+        fontStyle: 'bold'
+    }).setScrollFactor(0).setDepth(1001);
+
+    this.btnCongelar.on('pointerdown', () => { activarCongelamientoManual(this); });
+
+    this.stockVelocidad = parseInt(localStorage.getItem('udu_velocidad_inventario')) || 0;
+
+    fondoBtn.fillRoundedRect(230, 480, 60, 40, 8); // A la derecha
+
+    this.btnVelocidad = this.add.image(245, 500, 'btn_velocidad')
+        .setInteractive()
+        .setScale(0.5) // <-- MÁS CHICO
+        .setScrollFactor(0)
+        .setDepth(1000);
+
+    this.txtVelocidad = this.add.text(260, 493, 'x' + this.stockVelocidad, { 
+        fontSize: '14px', 
+        fill: '#ffcc00', 
+        fontStyle: 'bold'
+    }).setScrollFactor(0).setDepth(1001);
+
+    this.btnVelocidad.on('pointerdown', () => { activarVelocidadManual(this); });
 }
     
 function update() {
@@ -603,10 +787,14 @@ function update() {
     // Movimiento Estilo Tomb of the Mask
     if (this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0) {
         this.player.setTexture('player_idle');
-        if (this.cursors.left.isDown) this.player.body.setVelocityX(-400);
-        else if (this.cursors.right.isDown) this.player.body.setVelocityX(400);
-        else if (this.cursors.up.isDown) this.player.body.setVelocityY(-400);
-        else if (this.cursors.down.isDown) this.player.body.setVelocityY(400);
+        
+        // VELOCIDAD DINÁMICA: Si el booster está activo usa 900, si no usa 500
+        let velTeclado = window.velocidadActiva ? 900 : 500;
+
+        if (this.cursors.left.isDown) this.player.body.setVelocityX(-velTeclado);
+        else if (this.cursors.right.isDown) this.player.body.setVelocityX(velTeclado);
+        else if (this.cursors.up.isDown) this.player.body.setVelocityY(-velTeclado);
+        else if (this.cursors.down.isDown) this.player.body.setVelocityY(velTeclado);
     } else {
         if (this.player.body.velocity.x < 0) this.player.setTexture('player_left');
         else if (this.player.body.velocity.x > 0) this.player.setTexture('player_right');
@@ -617,20 +805,64 @@ function update() {
         this.aura.setPosition(this.player.x, this.player.y);
     }
     // --- DENTRO DEL UPDATE DE game.js ---
-if (this.zombiesSeguidores) {
+    if (this.zombiesSeguidores) {
     this.zombiesSeguidores.getChildren().forEach(stalker => {
-        // VERIFICACIÓN TRIPLE: ¿Existe el stalker? ¿Tiene cerebro? ¿Está vivo?
+        // SI ESTÁN CONGELADOS, LO FRENAMOS Y EVITAMOS QUE EL CEREBRO PIENSE
+        if (window.zombiesCongelados) {
+            if (stalker && stalker.body) stalker.body.setVelocity(0, 0);
+            return; 
+        }
+
         if (stalker && stalker.active && stalker.brain) {
             try {
                 stalker.brain.update();
             } catch (e) {
-                // Si falla, solo avisa una vez y desactiva el cerebro para no laguear
                 console.error("Error en el cerebro del zombie:", e);
                 stalker.brain = null; 
             }
         }
     });
 }
+
+    // ============================================
+    // LÓGICA DE CORRUPCIÓN ACTIVA (Rastro de Lava)
+    // ============================================
+    if (window.nivelCorrupto) {
+        // 1. Calculamos en qué celda de la cuadrícula (24x24) está el jugador AHORA
+        let celdaActualX = Math.floor(this.player.x / 24);
+        let celdaActualY = Math.floor(this.player.y / 24);
+
+        // 2. Si es la primera vez que se mueve, registramos su posición inicial
+        if (ultimaCeldaX === -1) {
+            ultimaCeldaX = celdaActualX;
+            ultimaCeldaY = celdaActualY;
+        }
+
+        // 3. Si el jugador cambió de celda, dejamos lava en la celda que acaba de abandonar
+        if (celdaActualX !== ultimaCeldaX || celdaActualY !== ultimaCeldaY) {
+            
+            // Convertimos la celda vieja a píxeles exactos (sumando 12 para centrar el bloque)
+            let pixelLavaX = (ultimaCeldaX * 24) + 12; 
+            let pixelLavaY = (ultimaCeldaY * 24) + 12;
+
+            // Creamos un cuadrado visual de lava pura (Color naranja/rojo)
+            let bloqueLava = this.add.rectangle(pixelLavaX, pixelLavaY, 24, 24, 0xff4500);
+            this.lavas.add(bloqueLava);
+
+            // Le damos un efecto de latido/brillo para que se vea súper amenazante
+            this.tweens.add({
+                targets: bloqueLava,
+                alpha: 0.5,
+                duration: 600,
+                yoyo: true,
+                repeat: -1
+            });
+
+            // Actualizamos la memoria para el siguiente paso
+            ultimaCeldaX = celdaActualX;
+            ultimaCeldaY = celdaActualY;
+        }
+    }
 }
 
 function activarEscudoManual(escena) {
@@ -680,7 +912,7 @@ function crearPatrullero(escena, x, y) {
     // 2. Configuración física del zombie
     zombie.setDepth(10);
     zombie.body.setCollideWorldBounds(true);
-    zombie.body.setBounce(1, 0); // Rebota al chocar con paredes
+    // zombie.body.setBounce(1, 0); // Rebota al chocar con paredes
     zombie.body.setVelocityX(150); // Empieza caminando a la derecha
 }
 
@@ -703,3 +935,137 @@ function reiniciarJuego() {
     document.getElementById('level-selector').style.display = 'flex';
     renderizarNiveles(); 
 }
+
+// --- ACTUALIZACIÓN GLOBAL v1.6: EL VERDADERO TÍTULO UX DE THE VOID (SANS-SERIF) ---
+function mostrarTitle(escena, textoRaw) {
+    if (escena.textoTitle) escena.textoTitle.destroy();
+
+    // 1. Parser de colores neón y lore
+    let colorNeón = '#f5b041'; // Amarillo-Crema UDU por defecto
+    let textoLimpio = textoRaw;
+
+    if (textoRaw.includes('{red}')) { colorNeón = '#ff3333'; } // Rojo Neón Infección
+    else if (textoRaw.includes('{purple}')) { colorNeón = '#bb86fc'; } // Morado The Void Galaxy
+    else if (textoRaw.includes('{cyan}')) { colorNeón = '#00ffff'; } // Cian Dynamics Stories
+    else if (textoRaw.includes('{gold}')) { colorNeón = '#ffd700'; } // Dorado Puntos
+
+    textoLimpio = textoRaw.replace(/{red}|{purple}|{cyan}|{gold}/g, '');
+
+    // 2. Estilo UX Pro: Fuente Sans-Serif moderna con sombra de código corrupto
+    escena.textoTitle = escena.add.text(180, 280, textoLimpio, {
+        fontSize: '22px',          // Subimos un pelín el tamaño para que luzca la fuente
+        fill: colorNeón,
+        fontFamily: 'sans-serif',  // ¡Adiós Arial! Hola estilo moderno y limpio
+        fontWeight: '900',         // Ultra-bold para que tenga impacto de título
+        align: 'center',
+        
+        // El contorno oscuro para separar el texto del fondo del laberinto
+        stroke: '#4a0000', 
+        strokeThickness: 2, 
+        
+        // La sombra neón con difuminado estilo "The Void"
+        shadow: {
+            offsetX: 3,
+            offsetY: 3,
+            color: '#ff0000', // Sombra roja como pediste
+            blur: 6,          // Efecto de brillo neón suavizado
+            stroke: true,
+            fill: true
+        },
+        wordWrap: { width: 280 }
+    }).setScrollFactor(0).setDepth(2000).setOrigin(0.5);
+
+    // 3. Timing cinematográfico de desvanecimiento (3 segundos totales)
+    escena.tweens.add({ targets: escena.textoTitle, alpha: 0, duration: 1000, delay: 2000,
+        onComplete: () => { if (escena.textoTitle) escena.textoTitle.destroy(); }
+    });
+}
+
+function activarCongelamientoManual(escena) {
+    if (escena.stockCongelamiento > 0 && !window.zombiesCongelados) {
+        
+        window.zombiesCongelados = true;
+        escena.stockCongelamiento -= 1;
+        localStorage.setItem('udu_congelamientos_inventario', escena.stockCongelamiento);
+        
+        // Actualizar visuales de la UI
+        escena.txtCongelar.setText('x' + escena.stockCongelamiento);
+        escena.btnCongelar.setTint(0x555555); // Se pone gris/oscuro
+        
+        console.log("❄️ ¡Zombis congelados por 5 segundos!");
+        
+        // 1. Flash visual azul en la pantalla
+        escena.cameras.main.flash(200, 0, 255, 255, 0.3);
+
+        // 2. Congelar a los patrulleros y volverlos azules
+        escena.zombies.getChildren().forEach(zombie => {
+            zombie.setData('velGuardada', zombie.body.velocity.x); // Guardamos si iba a izq o der
+            zombie.body.setVelocityX(0); // Lo frenamos
+            zombie.setTint(0x00ffff);    // Color cubo de hielo
+        });
+
+        // 3. Congelar Stalkers y volverlos azules
+        escena.zombiesSeguidores.getChildren().forEach(stalker => {
+            stalker.body.setVelocity(0, 0);
+            stalker.setTint(0x00ffff);
+        });
+
+        // 4. Timer de descongelamiento (Ej: 5 segundos = 5000ms)
+        escena.time.delayedCall(5000, () => {
+            window.zombiesCongelados = false;
+            escena.btnCongelar.clearTint(); // El botón vuelve a estar disponible
+
+            // Descongelar Zombis Patrulleros
+            escena.zombies.getChildren().forEach(zombie => {
+                zombie.clearTint();
+                // Le devolvemos la velocidad que tenía antes, o 150 por defecto
+                zombie.body.setVelocityX(zombie.getData('velGuardada') || 150);
+            });
+
+            // Descongelar Stalkers
+            escena.zombiesSeguidores.getChildren().forEach(stalker => {
+                stalker.clearTint();
+                // No hace falta darle velocidad, el StalkerBrain lo moverá en el siguiente update()
+            });
+            
+            console.log("🔥 Zombis descongelados.");
+        });
+    }
+}
+
+function activarVelocidadManual(escena) {
+    if (escena.stockVelocidad > 0 && !window.velocidadActiva) {
+        
+        window.velocidadActiva = true;
+        escena.stockVelocidad -= 1;
+        localStorage.setItem('udu_velocidad_inventario', escena.stockVelocidad);
+        
+        // Actualizar UI
+        escena.txtVelocidad.setText('x' + escena.stockVelocidad);
+        escena.btnVelocidad.setTint(0x555555); // Botón gris oscuro (en uso)
+        
+        console.log("⚡ ¡Booster de Velocidad activado! Tienes 10 segundos.");
+        
+        // Flash visual amarillo en pantalla
+        escena.cameras.main.flash(200, 255, 255, 0, 0.3);
+        
+        // Ponemos al jugador de color dorado (Opcional, pero se ve genial)
+        if (!tieneEscudo) escena.player.setTint(0xffcc00); 
+
+        // Timer de 10 segundos para quitar la velocidad
+        escena.time.delayedCall(10000, () => {
+            window.velocidadActiva = false;
+            escena.btnVelocidad.clearTint(); // El botón vuelve a la normalidad
+            
+            // Le quitamos el color dorado solo si no tiene el escudo activo
+            if (!tieneEscudo) {
+                escena.player.clearTint();
+            } else {
+                escena.player.setTint(0x00ffff); // Le regresamos el azul del escudo por si acaso
+            }
+            
+            console.log("🛑 Se acabó el booster de velocidad.");
+        });
+    }
+}
+

@@ -170,7 +170,7 @@ body {
     position: absolute;
     height: 8px;
     background: #b700ff;
-    width: 4150px; /* Suficiente para 10+ niveles */
+    width: 4200px; /* Suficiente para 10+ niveles */
     z-index: 1;
 }
 
@@ -256,7 +256,7 @@ body {
     color: var(--neon-pink);
 }
 
-.p-purple2 {
+.p-orange {
     color: #ffa600;
 }
 

@@ -21,19 +21,11 @@
                 <button id="btn-reset" class="menu-button" style="background-color: #ff4d4d; color: white;">BORRAR PROGRESO</button>
                 <button id="btn-credits" class="menu-button" onclick="abrirCreditos()">CRÉDITOS</button>
                 
-                <p class="notes-next-update"><span class="p-purple">Notas de la próxima update 1.6.</span><br><span class="p-purple2">"Soporte técnico Parte 1":</span><br>
-                    <span class="p-purple">(Mega Update):</span> Se agregarán muchas cosas importantes e interesantes en esta Mega Update 1.6 próximamente.<br> Esperamos que te haya gustado la <span class="p-purple">versión 1.5</span></7> :D</p>
-            </div>
-            
-            <img src="assets/ui/logo_UDU_Studios-pixelart.png" alt="UDU Studios" class="brand-logo">
+                <p class="notes-next-update"><span class="p-purple">Notas de esta versión 1.6</span> <span class="p-orange">"Soporte técnico Parte 1":</span><br>
+                    <span class="p-purple">¡llegó la Update 1.6!</span> Disfruta de 20 niveles completos, nuevas skins, dos boosters nuevos, arreglo de errores técnicos y más. :D</p>
+            </div> <img src="assets/ui/logo_UDU_Studios-pixelart.png" alt="UDU Studios" class="brand-logo">
 
-   <!-- <div id="auth-section">
-        <a href="../Signin_UDU_Studios/index.html" id="login-link" style="min-width: 140px;" onclick="alert('AVISO: Al volver serás redirigido a otro sitio de UDU Studios, no a este.')">
-            <div class="loader"></div> Verificando...
-        </a>
-        </div> -->
-
-        </div>
+   </div>
     </div>
 
     <div id="level-selector" style="display: none;">
@@ -73,13 +65,17 @@
         <button class="close-btn" onclick="cerrarCreditos()">&times;</button>
         <h2 class="creditos-h2">Créditos</h2>
         <p class="creditos-p">¡Esperamos que te haya gustado el juego!</p>
-        <p class="creditos-pMorado">Zombie Tomb - version 1.5</p>
+        <p class="creditos-pMorado">Zombie Tomb - version 1.6:</p>
+        <p class="notas-de-versión">
+            - Arreglos de errores técnicos<br>
+            - Más skins, dinámicas y boosters<br>
+            - 25 niveles y texturas nuevas</p>
         <p class="creditos-p">&copy; 2026 <strong>UDU Studios</strong>. Todos los derechos reservados.<br>
         Desarrollado por <strong><span class="U">U</span><span class="D">D</span><span class="U2">U</span> <span class="Studios">Studios</span></strong> & <strong><strong><span class="AlanRS">Alan R.S</span></strong></p>
     </div>
 
     <div class="version-game">
-        <p>Zombie Tomb <span class="p-purple">versión 1.5</span></p>
+        <p>Zombie Tomb <span class="p-purple">versión 1.6</span></p>
     </div>
 
     <div id="pantalla-muerte" class="overlay-muerte">
@@ -107,14 +103,7 @@
         }
 
         function volverAlMenu() {
-            // Ocultamos la tienda y mostramos el menú
-            document.getElementById('shop-container').style.display = 'none';
-            document.getElementById('main-menu').style.display = 'flex';
-    
-            // EL TRUCO MÁGICO: Reseteamos el scroll del menú para que el título se vea perfecto
-            const mainMenu = document.getElementById('main-menu');
-            mainMenu.scrollTop = 0;
-            window.scrollTo(0, 0);
+            location.reload();
         }
 
         function abrirCreditos() {

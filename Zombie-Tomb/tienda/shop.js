@@ -9,8 +9,12 @@ const catalogo = [
     { id: 'skin_blue', nombre: 'Skin Azul', precio: 100, img: 'assets/textures-shop/miniaturas/skin-blue-miniatura.png' },
     { id: 'skin_red', nombre: 'Skin Roja', precio: 100, img: 'assets/textures-shop/miniaturas/skin-red-miniatura.png' },
     { id: 'skin_purple', nombre: 'Skin Morada', precio: 100, img: 'assets/textures-shop/miniaturas/skin-purple-miniatura.png' },
-    { id: 'skin_multicolor1', nombre: 'Skin Multicolor 1', precio: 120, img: 'assets/textures-shop/miniaturas/skin-multicolor1-miniatura.png' },
-    { id: 'protection', nombre: 'Protección', precio: 170, img: 'assets/textures-shop/miniaturas/escudo-miniatura.png' }
+    { id: 'skin_void', nombre: 'Skin de The Void', precio: 100, img: 'assets/textures-shop/miniaturas/skin-void-miniatura.png' },
+    { id: 'skin_udu', nombre: 'Skin de UDU', precio: 100, img: "assets/textures-shop/miniaturas/skin-udu-miniatura.png" },
+    { id: 'skin_multicolor1', nombre: 'Skin Multicolor 1', precio: 100, img: 'assets/textures-shop/miniaturas/skin-multicolor1-miniatura.png' },
+    { id: 'protection', nombre: 'Escudo', precio: 150, img: 'assets/textures-shop/miniaturas/escudo-miniatura.png' },
+    { id: 'congelamiento', nombre: 'Congelar', precio: 150, img: 'assets/textures-shop/miniaturas/congelamiento-miniatura.png' },
+    { id: 'velocidad', nombre: 'Booster de velocidad', precio: 150, img: 'assets/textures-shop/miniaturas/velocidad-miniatura.png' }
 ];
 
 function renderizarTienda() {
@@ -79,17 +83,31 @@ function renderizarTienda() {
 }
 
 function comprar(id, precio) {
-   if (monedasActuales >= precio) {
+    if (monedasActuales >= precio) {
         if (id === 'protection') {
-            // Lógica de acumulado
             let cantidadEscudos = parseInt(localStorage.getItem('udu_escudos_inventario')) || 0;
             cantidadEscudos += 1;
             localStorage.setItem('udu_escudos_inventario', cantidadEscudos);
-            
             monedasActuales -= precio;
             localStorage.setItem('udu_monedas', monedasActuales);
-            
             alert(`🛡️ ¡Escudo comprado! Tienes ${cantidadEscudos} en tu inventario.`);
+            
+        } else if (id === 'congelamiento') { // <-- NUEVO LOGICA CONGELAR
+            let cantidadCongelar = parseInt(localStorage.getItem('udu_congelamientos_inventario')) || 0;
+            cantidadCongelar += 1;
+            localStorage.setItem('udu_congelamientos_inventario', cantidadCongelar);
+            monedasActuales -= precio;
+            localStorage.setItem('udu_monedas', monedasActuales);
+            alert(`❄️ ¡Congelamiento comprado! Tienes ${cantidadCongelar} en tu inventario.`);
+            
+        } else if (id === 'velocidad') { // <-- PREPARADO PARA EL FUTURO
+            let cantidadVelocidad = parseInt(localStorage.getItem('udu_velocidad_inventario')) || 0;
+            cantidadVelocidad += 1;
+            localStorage.setItem('udu_velocidad_inventario', cantidadVelocidad);
+            monedasActuales -= precio;
+            localStorage.setItem('udu_monedas', monedasActuales);
+            alert(`⚡ ¡Booster de Velocidad comprado! Tienes ${cantidadVelocidad} en tu inventario.`);
+            
         } else {
             // Lógica normal para skins...
             if (!skinsCompradas.includes(id)) {
@@ -128,15 +146,15 @@ function canjearPuntos() {
 }
 
 function equiparSkin(id) {
-    // Solo skins (puedes añadir más IDs aquí si creas más skins)
-    if (id === 'skin_blue' || id === 'skin_red' || id === 'skin_purple' || id === 'skin_multicolor1') {
+    // Quitamos los potenciadores de aquí para que salte la alerta correcta
+    if ( id === 'skin_blue' || id === 'skin_red' || id === 'skin_purple' || id === 'skin_multicolor1' || id === 'skin_void' || id === 'skin_udu') {
         localStorage.setItem('udu_skin_equipada', id);
         alert("¡Skin equipada con éxito!");
         renderizarTienda(); 
     } else {
         alert("Este objeto es un potenciador y se activa solo en el nivel.");
     }
-    location.reload()
+    location.reload();
 }
 
 function desequiparSkin() {
